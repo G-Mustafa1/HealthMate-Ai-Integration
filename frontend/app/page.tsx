@@ -51,7 +51,7 @@ export default function Home() {
         localStorage.setItem("user", JSON.stringify(data.user));
 
         Swal.fire({ icon: "success", title: "Welcome!", text: "Login successful.", timer: 1200, showConfirmButton: false });
-        router.replace("/dashboard");
+        router.push("/dashboard");
       } else {
         Swal.fire({ icon: "success", title: "Signup successful!", text: "Please login now." });
         setIsLogin(true);
@@ -64,7 +64,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-secondary to-background flex items-center justify-center p-4">
+    <div className="min-h-screen from-background via-secondary to-background flex items-center justify-center p-4">
       <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
         {/* Left - Info */}
         <div className="hidden md:block space-y-8">
@@ -80,21 +80,21 @@ export default function Home() {
 
           <div className="space-y-6">
             <div className="flex gap-4">
-              <FileText className="w-6 h-6 text-accent flex-shrink-0 mt-1" />
+              <FileText className="w-6 h-6 text-accent shrink-0 mt-1" />
               <div>
                 <h3 className="font-semibold mb-1">Upload Reports</h3>
                 <p className="text-sm text-muted-foreground">Store your medical reports safely in one place.</p>
               </div>
             </div>
             <div className="flex gap-4">
-              <Heart className="w-6 h-6 text-accent flex-shrink-0 mt-1" />
+              <Heart className="w-6 h-6 text-accent shrink-0 mt-1" />
               <div>
                 <h3 className="font-semibold mb-1">AI-Powered Analysis</h3>
                 <p className="text-sm text-muted-foreground">Get instant summaries in English & Roman Urdu.</p>
               </div>
             </div>
             <div className="flex gap-4">
-              <TrendingUp className="w-6 h-6 text-accent flex-shrink-0 mt-1" />
+              <TrendingUp className="w-6 h-6 text-accent shrink-0 mt-1" />
               <div>
                 <h3 className="font-semibold mb-1">Track Your Health</h3>
                 <p className="text-sm text-muted-foreground">Monitor vitals and view your medical timeline.</p>
