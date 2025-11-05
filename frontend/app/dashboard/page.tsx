@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Plus, FileText, Activity } from "lucide-react";
 import Link from "next/link";
 import Swal from "sweetalert2";
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface User {
@@ -52,11 +51,15 @@ export default function Dashboard() {
           method: "GET",
           credentials: "include",
         });
-
+        console.log(reportRes);
+        
         if (reportRes.ok) {
           const reportData = await reportRes.json();
+          console.log(reportData.reports[0],"ii");
+          
           setReports(reportData.reports || []);
         }
+        
       } catch (error) {
         console.error(error);
         router.push("/");
@@ -109,7 +112,6 @@ export default function Dashboard() {
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
-
   return (
     <div className="min-h-screen bg-background">
       <main className="max-w-7xl mx-auto px-4 py-8">
@@ -180,7 +182,7 @@ export default function Dashboard() {
                   >
                     <span>{r.filename}</span>
                     {/* ✅ View Cloudinary file directly */}
-                    <Link href={`/dashboard/report-page/${r._id}`} className="text-accent underline">
+                    <Link href={`/dashboard/report-page/123`} className="text-accent underline">
                       View
                     </Link>
                   </li>
