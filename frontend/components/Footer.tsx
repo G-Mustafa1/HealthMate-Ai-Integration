@@ -31,7 +31,6 @@ const footerLinks = [
 export default function Footer() {
     const {
         user,
-        isAuthenticated,
         authChecked,
     } = useSelector((state: RootState) => state.auth);
 
@@ -99,7 +98,7 @@ export default function Footer() {
                         </h3>
 
                         <ul className="space-y-3">
-                            {authChecked && isAuthenticated && user ? (
+                            {authChecked  && user ? (
                                 footerLinks[0].links.map((link) => (
                                     <li key={link.href}>
                                         <Link
@@ -116,7 +115,7 @@ export default function Footer() {
                                 <>
                                     <li>
                                         <Link
-                                            href="/"
+                                            href="/auth"
                                             className="group inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-primary"
                                         >
                                             Login
@@ -126,7 +125,7 @@ export default function Footer() {
 
                                     <li>
                                         <Link
-                                            href="/"
+                                            href="/auth"
                                             className="group inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-primary"
                                         >
                                             Register
@@ -234,21 +233,21 @@ export default function Footer() {
 
                     <div className="flex items-center justify-center gap-5 text-xs text-muted-foreground sm:justify-end">
                         <Link
-                            href="/privacy"
+                            href="/"
                             className="transition-colors hover:text-primary"
                         >
                             Privacy
                         </Link>
 
                         <Link
-                            href="/terms"
+                            href="/"
                             className="transition-colors hover:text-primary"
                         >
                             Terms
                         </Link>
 
                         <Link
-                            href="/contact"
+                            href="/"
                             className="transition-colors hover:text-primary"
                         >
                             Contact
