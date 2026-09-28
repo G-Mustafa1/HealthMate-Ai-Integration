@@ -12,6 +12,12 @@ authRouter.post('/signup', async (req, res) => {
         if (!firstname || !lastname) {
             return res.status(400).json({ error: "First name and last name are required" });
         }
+        if (!email){
+            return res.status(400).json({ error: "Email is required" });
+        }
+        if (!password) {
+            return res.status(400).json({ error: "Password is required" });
+        }
         if (!validator.isEmail(email)) {
             return res.status(400).json({ error: "Invalid email format" });
         }
@@ -34,17 +40,6 @@ authRouter.post('/signup', async (req, res) => {
         });
 
         await newUser.save();
-
-        const token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
-
-        // ✅ COOKIE SETTINGS (Vercel Ready)
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true, // Required on Vercel (HTTPS)
-            sameSite: "none", // Required for cross-origin cookies
-            path: "/",
-            maxAge: 24 * 60 * 60 * 1000, // 1 day
-        });
 
         res.status(200).json({ message: 'User signed up successfully', user: newUser });
 
