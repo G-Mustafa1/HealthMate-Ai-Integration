@@ -1,81 +1,161 @@
 const { GoogleGenAI } = require("@google/genai");
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY
+});
 
 const buildPromptForReport = () => `
-You will receive a file (PDF or image).
-Read it carefully and return ONLY a JSON object (no extra commentary) with this structure:
+You will receive a PDF or image.
+
+Analyze ONLY medical reports such as blood tests, lab reports, X-ray, CT, MRI, ultrasound, ECG, pathology, or other clearly medical reports.
+
+If the file is NOT a medical report, return:
 {
-  "title": "short title or subject of the document",
-  "date": "any visible or implied date",
-  "summary": "concise explanation of what this file is about",
-  "explanation_en": "a simple paragraph in English explaining it for a general reader",
-  "explanation_ro": "translate explanation_en to Roman Urdu using Latin letters",
-  "suggested_questions": ["user questions they might ask about this file"]
+  "is_medical_report": false,
+  "title": "",
+  "date": "",
+  "summary": "",
+  "explanation_en": "",
+  "explanation_ro": "",
+  "suggested_questions": []
 }
-If the file is not medical, still summarize it accurately.
-If some fields are not available, leave them blank or empty array.
+
+If the file IS a medical report, return:
+{
+  "is_medical_report": true,
+  "title": "short medical report title",
+  "date": "visible date or empty string",
+  "summary": "short medical summary",
+  "explanation_en": "simple and short explanation in English",
+  "explanation_ro": "same explanation in Roman Urdu",
+  "suggested_questions": ["up to 3 relevant questions"]
+}
+
+Roman Urdu rules:
+- Use ONLY English/Latin letters.
+- Do NOT use Urdu, Arabic, or Persian script.
+- Do NOT translate word-by-word.
+- Write natural, easy-to-understand Pakistani Roman Urdu.
+- explanation_ro must explain the same information as explanation_en.
+
+Use only information visible in the report.
+Do not invent information.
+Do not analyze non-medical files.
+Keep the response concise.
+Return ONLY valid JSON.
 `;
 
-async function analyzeFileBase64(fileBase64, mimeType = "application/pdf") {
+
+async function analyzeFileBase64(
+    fileBase64,
+    mimeType = "application/pdf"
+) {
     try {
         const contents = [
             {
                 role: "user",
                 parts: [
-                    { text: buildPromptForReport() },
-                    { inlineData: { mimeType, data: fileBase64 } }
+                    {
+                        text: buildPromptForReport()
+                    },
+                    {
+                        inlineData: {
+                            mimeType,
+                            data: fileBase64
+                        }
+                    }
                 ]
             }
         ];
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash", // ✅ faster & higher limits
+            model: "gemini-2.5-flash",
             contents,
+            config: {
+                temperature: 0.1,
+                responseMimeType: "application/json",
+                maxOutputTokens: 1500
+            }
         });
 
-        const rawText = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        const rawText =
+            response.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-        console.log("🧾 Gemini Raw Response:", rawText.slice(0, 200));
+        console.log(
+            "🧾 Gemini Response:",
+            rawText.slice(0, 500)
+        );
 
         let parsed = null;
+
         try {
-            const start = rawText.indexOf("{");
-            const end = rawText.lastIndexOf("}");
-            if (start !== -1 && end !== -1) {
-                parsed = JSON.parse(rawText.slice(start, end + 1));
-            }
+            parsed = JSON.parse(rawText);
         } catch (jsonErr) {
-            console.warn("⚠️ JSON Parse Error:", jsonErr.message);
+            console.warn(
+                "⚠️ JSON Parse Error:",
+                jsonErr.message
+            );
+        }
+
+        if (!parsed) {
+            return {
+                ok: false,
+                isMedicalReport: false,
+                parsed: null,
+                rawText
+            };
+        }
+
+        if (parsed.is_medical_report !== true) {
+            return {
+                ok: true,
+                isMedicalReport: false,
+                parsed: {
+                    is_medical_report: false,
+                    title: "",
+                    date: "",
+                    summary: "",
+                    explanation_en: "",
+                    explanation_ro: "",
+                    suggested_questions: []
+                },
+                rawText
+            };
         }
 
         return {
-            ok: !!parsed,
-            parsed: parsed || {
-                title: "Untitled Report",
-                date: "",
-                summary: rawText || "No structured data found.",
-                explanation_en: rawText,
-                explanation_ro: "",
-                suggested_questions: []
+            ok: true,
+            isMedicalReport: true,
+            parsed: {
+                is_medical_report: true,
+                title: parsed.title || "Medical Report",
+                date: parsed.date || "",
+                summary: parsed.summary || "",
+                explanation_en: parsed.explanation_en || "",
+                explanation_ro: parsed.explanation_ro || "",
+                suggested_questions:
+                    Array.isArray(parsed.suggested_questions)
+                        ? parsed.suggested_questions.slice(0, 3)
+                        : []
             },
             rawText
         };
+
     } catch (err) {
-        console.error("❌ Gemini AI Error:", err.message);
+        console.error(
+            "❌ Gemini AI Error:",
+            err.message
+        );
+
         return {
             ok: false,
-            parsed: {
-                title: "Error",
-                date: "",
-                summary: "Error analyzing report.",
-                explanation_en: err.message,
-                explanation_ro: "",
-                suggested_questions: []
-            },
+            isMedicalReport: false,
+            parsed: null,
             rawText: ""
         };
     }
 }
 
-module.exports = { analyzeFileBase64 };
+module.exports = {
+    analyzeFileBase64
+};

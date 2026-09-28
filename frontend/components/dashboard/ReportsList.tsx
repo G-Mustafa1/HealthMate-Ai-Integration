@@ -248,7 +248,7 @@ const ReportsList = () => {
 
                                     {/* View Button */}
                                     <Link
-                                        href={`/dashboard/report-page/${report._id}`}
+                                        href={`/dashboard/${report._id}`}
                                         className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary transition-all duration-200 hover:bg-primary hover:text-primary-foreground sm:w-auto"
                                     >
                                         View Report

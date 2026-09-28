@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+
 import {
   loginUser,
   signupUser,
@@ -69,7 +70,6 @@ const authSlice = createSlice({
 
       .addCase(signupUser.fulfilled, (state) => {
         state.loading = false;
-        state.user = null;
         state.error = null;
       })
 
@@ -98,17 +98,20 @@ const authSlice = createSlice({
 
       // GET USER
       .addCase(getUser.pending, (state) => {
+        state.loading = true;
         state.authChecked = false;
         state.error = null;
       })
 
       .addCase(getUser.fulfilled, (state, action) => {
+        state.loading = false;
         state.user = action.payload;
         state.authChecked = true;
         state.error = null;
       })
 
       .addCase(getUser.rejected, (state) => {
+        state.loading = false;
         state.user = null;
         state.authChecked = true;
         state.error = null;

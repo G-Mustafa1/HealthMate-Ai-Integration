@@ -40,7 +40,7 @@ export const getMyReports = createAsyncThunk<
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.error ||
-          "Failed to fetch reports"
+        "Failed to fetch reports"
       );
     }
   }
@@ -63,7 +63,7 @@ export const getSingleReport = createAsyncThunk<
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.error ||
-          "Failed to fetch report"
+        "Failed to fetch report"
       );
     }
   }
@@ -86,18 +86,14 @@ export const getInsights = createAsyncThunk<
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.error ||
-          "Failed to fetch insights"
+        "Failed to fetch insights"
       );
     }
   }
 );
 
 // UPLOAD REPORT
-export const uploadReport = createAsyncThunk<
-  Report,
-  File,
-  { rejectValue: string }
->(
+export const uploadReport = createAsyncThunk<Report, File, { rejectValue: string }>(
   "reports/uploadReport",
   async (file, { rejectWithValue }) => {
     try {
@@ -105,20 +101,26 @@ export const uploadReport = createAsyncThunk<
 
       formData.append("file", file);
 
-      const response = await axiosInstance.post(
-        "/report/upload",
-        formData
-      );
+      const response = await axiosInstance.post("/report/upload",formData);
 
       return response.data.report;
+
     } catch (error: any) {
+      console.error(
+        "❌ Upload API Error:",
+        error.response?.data || error.message
+      );
+
       return rejectWithValue(
+        error.response?.data?.message ||
         error.response?.data?.error ||
-          "Failed to upload report"
+        error.message ||
+        "Failed to upload report"
       );
     }
   }
 );
+
 
 // DELETE REPORT
 export const deleteReport = createAsyncThunk<
@@ -135,7 +137,7 @@ export const deleteReport = createAsyncThunk<
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.error ||
-          "Failed to delete report"
+        "Failed to delete report"
       );
     }
   }
