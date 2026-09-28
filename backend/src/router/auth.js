@@ -12,7 +12,7 @@ authRouter.post('/signup', async (req, res) => {
         if (!firstname || !lastname) {
             return res.status(400).json({ error: "First name and last name are required" });
         }
-        if (!email){
+        if (!email) {
             return res.status(400).json({ error: "Email is required" });
         }
         if (!password) {
