@@ -1,6 +1,4 @@
 "use client";
-
-import Link from "next/link";
 import {
     Heart,
     Mail,
@@ -15,6 +13,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import Link from "next/link";
 
 const footerLinks = [
     {
