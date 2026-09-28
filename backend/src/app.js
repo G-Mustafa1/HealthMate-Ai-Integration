@@ -12,13 +12,51 @@ const { vitalsRouter } = require('./router/vitial');
 
 const app = express();
 
-app.use(cors({
-  origin: process.env.CLIENT_URL, // Use environment variable or default to localhost
-  credentials: true,// Allow cookies to be sent with requests
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+// app.use(cors({
+//   origin: process.env.CLIENT_URL, // Use environment variable or default to localhost
+//   credentials: true,// Allow cookies to be sent with requests
+//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
   
-}));
+// }));
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://health-mate-ai-integration-s7fj.vercel.app",
+];
+
+// =========================
+// CORS
+// =========================
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      console.log("CORS Origin:", origin);
+
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS blocked: ${origin}`));
+      }
+    },
+
+    credentials: true,
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
+  })
+);
 
 
 app.use(express.json());
