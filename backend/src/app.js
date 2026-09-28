@@ -1,24 +1,32 @@
 const express = require('express');
 require('dotenv').config();
+
+const cors = require('cors')
+const cookieParser = require('cookie-parser');
+
 const { connectDB } = require("./config/database")
 const { profileRouter } = require('./router/profile');
 const { authRouter } = require('./router/auth');
 const { reportRouter } = require('./router/report');
 const { vitalsRouter } = require('./router/vitial');
-const cookieParser = require('cookie-parser');
-const cors = require('cors')
+
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 app.use(cors({
   origin: process.env.CLIENT_URL, // Use environment variable or default to localhost
   credentials: true,// Allow cookies to be sent with requests
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  
+}));
 
-}))
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+
+console.log(process.env.CLIENT_URL, "client url");
 app.use('/auth', authRouter);
 app.use('/profile', profileRouter);
 app.use('/report', reportRouter);
