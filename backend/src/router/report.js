@@ -11,46 +11,30 @@ const { analyzeFileBase64 } = require('../gemini-api/gemini');
 reportRouter.post('/upload', userAuth, upload.single('file'), async (req, res) => {
     try {
         if (!req.file) {
-            return res.status(400).json({
-                success: false,
-                message: 'Medical report file is required'
-            });
+            return res.status(400).json({ success: false, message: 'Medical report file is required' });
         }
 
         const fileUrl = req.file.path;
         const publicId = req.file.filename;
         const mimeType = req.file.mimetype;
+        const resourceType = mimeType === 'application/pdf' ? 'raw' : 'image';
 
-        // Download file from Cloudinary
         const fileResponse = await fetch(fileUrl);
 
         if (!fileResponse.ok) {
-            return res.status(400).json({
-                success: false,
-                message: 'Unable to read uploaded file'
-            });
+            return res.status(400).json({ success: false, message: 'Unable to read uploaded file' });
         }
 
         const arrayBuffer = await fileResponse.arrayBuffer();
+        const base64File = Buffer.from(arrayBuffer).toString('base64');
 
-        const base64File = Buffer.from(arrayBuffer).toString("base64");
+        const ai = await analyzeFileBase64(base64File, mimeType);
 
-        // 🤖 Analyze with Gemini
-        const ai = await analyzeFileBase64(
-            base64File,
-            mimeType
-        );
-
-        // ❌ AI analysis failed
         if (!ai?.ok) {
-            // Remove uploaded file
             try {
-                await cloudinary.uploader.destroy(publicId);
+                await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
             } catch (deleteErr) {
-                console.warn(
-                    "Cloudinary delete error:",
-                    deleteErr.message
-                );
+                console.warn('Cloudinary delete error:', deleteErr.message);
             }
 
             return res.status(500).json({
@@ -59,16 +43,11 @@ reportRouter.post('/upload', userAuth, upload.single('file'), async (req, res) =
             });
         }
 
-        // ❌ Not a medical report
         if (!ai.isMedicalReport) {
-            // Delete non-medical file from Cloudinary
             try {
-                await cloudinary.uploader.destroy(publicId);
+                await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
             } catch (deleteErr) {
-                console.warn(
-                    "Cloudinary delete error:",
-                    deleteErr.message
-                );
+                console.warn('Cloudinary delete error:', deleteErr.message);
             }
 
             return res.status(400).json({
@@ -78,21 +57,17 @@ reportRouter.post('/upload', userAuth, upload.single('file'), async (req, res) =
             });
         }
 
-        // ✅ Save only medical reports
         const report = await Report.create({
             user: req.user._id,
             filename: req.file.originalname,
             fileUrl,
             public_id: publicId,
-
+            resource_type: resourceType,
             title: ai.parsed.title || 'Medical Report',
-
+            dateSeen: ai.parsed.date || '',
             summary: ai.parsed.summary || '',
-
             explanation_en: ai.parsed.explanation_en || '',
-
             explanation_ro: ai.parsed.explanation_ro || '',
-
             suggested_questions: ai.parsed.suggested_questions || []
         });
 
@@ -103,7 +78,7 @@ reportRouter.post('/upload', userAuth, upload.single('file'), async (req, res) =
         });
 
     } catch (err) {
-        console.error("❌ Upload Error:", err);
+        console.error('❌ Upload Error:', err);
 
         return res.status(500).json({
             success: false,
@@ -111,8 +86,9 @@ reportRouter.post('/upload', userAuth, upload.single('file'), async (req, res) =
             error: err.message
         });
     }
-}
-);
+});
+
+
 
 
 // ✅ Fetch My Reports
@@ -139,44 +115,36 @@ reportRouter.get('/myreports', userAuth, async (req, res) => {
 // ✅ Delete Report + Cloudinary
 reportRouter.delete('/:id', userAuth, async (req, res) => {
     try {
-        const report = await Report.findOne({
-            _id: req.params.id,
-            user: req.user._id
-        });
+        const report = await Report.findOne({ _id: req.params.id, user: req.user._id });
 
         if (!report) {
-            return res.status(404).json({
-                success: false,
-                message: 'Report not found'
-            });
+            return res.status(404).json({ success: false, message: 'Report not found' });
         }
 
         if (report.public_id) {
-            await cloudinary.uploader.destroy(
-                report.public_id
-            );
+            const deleteResult = await cloudinary.uploader.destroy(report.public_id, {
+                resource_type: report.resource_type || 'image'
+            });
         }
 
-        await Report.findByIdAndDelete(
-            report._id
-        );
+        await Report.findByIdAndDelete(report._id);
 
         return res.status(200).json({
             success: true,
-            message:
-                'Report deleted successfully from DB & Cloudinary ✅'
+            message: 'Report deleted successfully from DB & Cloudinary ✅'
         });
 
     } catch (error) {
+        console.error('❌ Delete Error:', error);
+
         return res.status(500).json({
             success: false,
-            message:
-                'Error while deleting report',
+            message: 'Error while deleting report',
             error: error.message
         });
     }
-}
-);
+});
+
 
 
 // ✅ Insights

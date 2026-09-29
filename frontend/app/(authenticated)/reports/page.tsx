@@ -293,7 +293,7 @@ const Reports = () => {
                                     {/* Actions */}
                                     <div className="flex gap-2 pt-1">
                                         <Link
-                                            href={`/dashboard/report-page/${report._id}`}
+                                            href={`/dashboard/${report._id}`}
                                             className="flex-1"
                                         >
                                             <Button

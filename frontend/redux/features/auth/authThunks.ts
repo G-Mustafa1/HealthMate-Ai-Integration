@@ -2,7 +2,8 @@ import axiosInstance from "@/services/api";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export interface User {
-  _id: string;
+  _id?: string;
+  id?: string;
   firstname: string;
   lastname: string;
   email: string;

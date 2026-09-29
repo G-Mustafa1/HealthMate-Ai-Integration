@@ -106,12 +106,8 @@ export const uploadReport = createAsyncThunk<Report, File, { rejectValue: string
       return response.data.report;
 
     } catch (error: any) {
-      console.error(
-        "❌ Upload API Error:",
-        error.response?.data || error.message
-      );
-
-      return rejectWithValue(
+      
+    return rejectWithValue(
         error.response?.data?.message ||
         error.response?.data?.error ||
         error.message ||

@@ -1,11 +1,8 @@
 const { GoogleGenAI } = require("@google/genai");
 
-const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY
-});
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-const buildPromptForReport = () => `
-You will receive a PDF or image.
+const buildPromptForReport = () => `You will receive a PDF or image.
 
 Analyze ONLY medical reports such as blood tests, lab reports, X-ray, CT, MRI, ultrasound, ECG, pathology, or other clearly medical reports.
 
@@ -42,83 +39,50 @@ Use only information visible in the report.
 Do not invent information.
 Do not analyze non-medical files.
 Keep the response concise.
-Return ONLY valid JSON.
-`;
+Return ONLY valid JSON.`;
 
-
-async function analyzeFileBase64(
-    fileBase64,
-    mimeType = "application/pdf"
-) {
+async function analyzeFileBase64(fileBase64, mimeType = "application/pdf") {
     try {
-        const contents = [
-            {
-                role: "user",
-                parts: [
-                    {
-                        text: buildPromptForReport()
-                    },
-                    {
-                        inlineData: {
-                            mimeType,
-                            data: fileBase64
-                        }
-                    }
-                ]
-            }
-        ];
+        if (!fileBase64) throw new Error("File data is empty");
+        if (!mimeType) mimeType = "application/pdf";
+
+        console.log("🤖 Gemini analyzing:", { mimeType, base64Length: fileBase64.length });
 
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            contents,
-            config: {
-                temperature: 0.1,
-                responseMimeType: "application/json",
-                maxOutputTokens: 1500
-            }
+            contents: [{ role: "user", parts: [{ text: buildPromptForReport() }, { inlineData: { mimeType: mimeType, data: fileBase64 } }] }],
+            config: { temperature: 0, responseMimeType: "application/json", maxOutputTokens: 2000 }
         });
 
-        const rawText =
-            response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        const rawText = response.text?.trim() || response.candidates?.[0]?.content?.parts?.map(part => part.text || "").join("").trim() || "";
 
-        console.log(
-            "🧾 Gemini Response:",
-            rawText.slice(0, 500)
-        );
+        console.log("🧾 Gemini Response:", rawText.slice(0, 1000));
 
-        let parsed = null;
+        if (!rawText) {
+            console.error("❌ Gemini returned empty response");
+            return { ok: false, isMedicalReport: false, parsed: null, rawText: "", error: "Gemini returned an empty response" };
+        }
+
+        let parsed;
 
         try {
             parsed = JSON.parse(rawText);
-        } catch (jsonErr) {
-            console.warn(
-                "⚠️ JSON Parse Error:",
-                jsonErr.message
-            );
+        } catch (err) {
+            console.error("❌ JSON Parse Error:", err.message);
+            console.error("Raw Gemini output:", rawText);
+            return { ok: false, isMedicalReport: false, parsed: null, rawText, error: "Gemini returned invalid JSON" };
         }
 
-        if (!parsed) {
-            return {
-                ok: false,
-                isMedicalReport: false,
-                parsed: null,
-                rawText
-            };
+        if (typeof parsed !== "object" || parsed === null || typeof parsed.is_medical_report !== "boolean") {
+            console.error("❌ Invalid Gemini JSON structure:", parsed);
+            return { ok: false, isMedicalReport: false, parsed: null, rawText, error: "Invalid Gemini response structure" };
         }
 
-        if (parsed.is_medical_report !== true) {
+        if (!parsed.is_medical_report) {
             return {
                 ok: true,
                 isMedicalReport: false,
-                parsed: {
-                    is_medical_report: false,
-                    title: "",
-                    date: "",
-                    summary: "",
-                    explanation_en: "",
-                    explanation_ro: "",
-                    suggested_questions: []
-                },
+                parsed: { is_medical_report: false, title: "", date: "", summary: "", explanation_en: "", explanation_ro: "", suggested_questions: [] },
                 rawText
             };
         }
@@ -128,34 +92,20 @@ async function analyzeFileBase64(
             isMedicalReport: true,
             parsed: {
                 is_medical_report: true,
-                title: parsed.title || "Medical Report",
-                date: parsed.date || "",
-                summary: parsed.summary || "",
-                explanation_en: parsed.explanation_en || "",
-                explanation_ro: parsed.explanation_ro || "",
-                suggested_questions:
-                    Array.isArray(parsed.suggested_questions)
-                        ? parsed.suggested_questions.slice(0, 3)
-                        : []
+                title: typeof parsed.title === "string" ? parsed.title : "Medical Report",
+                date: typeof parsed.date === "string" ? parsed.date : "",
+                summary: typeof parsed.summary === "string" ? parsed.summary : "",
+                explanation_en: typeof parsed.explanation_en === "string" ? parsed.explanation_en : "",
+                explanation_ro: typeof parsed.explanation_ro === "string" ? parsed.explanation_ro : "",
+                suggested_questions: Array.isArray(parsed.suggested_questions) ? parsed.suggested_questions.filter(q => typeof q === "string").slice(0, 3) : []
             },
             rawText
         };
 
     } catch (err) {
-        console.error(
-            "❌ Gemini AI Error:",
-            err.message
-        );
-
-        return {
-            ok: false,
-            isMedicalReport: false,
-            parsed: null,
-            rawText: ""
-        };
+        console.error("❌ Gemini AI Error:", err);
+        return { ok: false, isMedicalReport: false, parsed: null, rawText: "", error: err?.message || "Gemini analysis failed" };
     }
 }
 
-module.exports = {
-    analyzeFileBase64
-};
+module.exports = { analyzeFileBase64 };

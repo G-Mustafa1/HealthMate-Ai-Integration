@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
-    ArrowLeft,
     Eye,
     EyeOff,
     LockKeyhole,
     Mail,
     User,
     UserRound,
+    Loader2,
 } from "lucide-react";
 
 import {
@@ -33,7 +33,6 @@ import {
 } from "@/redux/features/auth/authThunks";
 
 import toast from "react-hot-toast";
-import Link from "next/link";
 
 interface AuthFormProps {
     isLogin: boolean;
@@ -84,8 +83,8 @@ export default function AuthForm({
         }
     };
 
-    const validateEmail = (email: string) =>
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
 
     const handleSubmit = async (
         e: React.FormEvent<HTMLFormElement>
@@ -102,45 +101,33 @@ export default function AuthForm({
 
         if (!isLogin) {
             if (!firstname || firstname.length < 2) {
-                setValidationError(
-                    "Please enter a valid first name."
-                );
+                setValidationError("Please enter a valid first name.");
                 return;
             }
 
             if (!lastname || lastname.length < 2) {
-                setValidationError(
-                    "Please enter a valid last name."
-                );
+                setValidationError("Please enter a valid last name.");
                 return;
             }
         }
 
         if (!email) {
-            setValidationError(
-                "Email address is required."
-            );
+            setValidationError("Email address is required.");
             return;
         }
 
         if (!validateEmail(email)) {
-            setValidationError(
-                "Please enter a valid email address."
-            );
+            setValidationError("Please enter a valid email address.");
             return;
         }
 
         if (!password) {
-            setValidationError(
-                "Password is required."
-            );
+            setValidationError("Password is required.");
             return;
         }
 
         if (password.length < 8) {
-            setValidationError(
-                "Password must be at least 8 characters."
-            );
+            setValidationError("Password must be at least 8 characters.");
             return;
         }
 
@@ -153,21 +140,15 @@ export default function AuthForm({
                     })
                 ).unwrap();
 
-                toast.success("Welcome back!");
+                toast.success("Login successful");
                 router.replace("/dashboard");
                 return;
             }
 
             await dispatch(
-                signupUser({
-                    firstname,
-                    lastname,
-                    email,
-                    password,
-                })
-            ).unwrap();
+                signupUser({ firstname, lastname, email, password, })).unwrap();
 
-            toast.success("Account created successfully!");
+            toast.success("Account created successfully! Please sign in.");
 
             setIsLogin(true);
 
@@ -179,8 +160,8 @@ export default function AuthForm({
             });
 
             setShowPassword(false);
-        } catch (err) {
-            console.error("Authentication error:", err);
+        } catch (err: any) {
+            toast.error("Invalid credentials");
         }
     };
 
@@ -196,45 +177,8 @@ export default function AuthForm({
 
             {/* Header */}
             <CardHeader className="px-6 pb-4 pt-7 sm:px-8 sm:pt-8">
-                <div className=" flex items-center justify-center">
-                    <Link
-                        href="/"
-                        aria-label="Back to HealthMate home"
-                        className="
-        group inline-flex items-center gap-1
-        rounded-full
-        border border-border/60
-        bg-background/85
-        px-4 py-2.5
-        text-sm font-medium
-        text-muted-foreground
-        shadow-sm
-        backdrop-blur-xl
-        transition-all duration-200
-
-        hover:-translate-x-0.5
-        hover:border-primary/30
-        hover:bg-primary/5
-        hover:text-primary
-        hover:shadow-md
-
-        sm:left-6 sm:top-6
-        lg:left-8 lg:top-8
-    "
-                    >
-                        <ArrowLeft
-                            className="
-            h-4 w-4
-            transition-transform duration-200
-            group-hover:-translate-x-0.5
-        "
-                        />
-
-                        <span>Back to Home</span>
-                    </Link>
-                </div>
                 {/* Top status */}
-                <div className="mb-6 flex items-center justify-between">
+                <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                             <LockKeyhole className="h-4 w-4" />
@@ -274,8 +218,8 @@ export default function AuthForm({
                             if (!isLogin) handleToggle();
                         }}
                         className={`rounded-lg py-2.5 text-sm font-medium transition-all ${isLogin
-                            ? "bg-background text-foreground shadow-sm"
-                            : "text-muted-foreground hover:text-foreground"
+                                ? "bg-background text-foreground shadow-sm"
+                                : "text-muted-foreground hover:text-foreground"
                             }`}
                     >
                         Sign in
@@ -287,8 +231,8 @@ export default function AuthForm({
                             if (isLogin) handleToggle();
                         }}
                         className={`rounded-lg py-2.5 text-sm font-medium transition-all ${!isLogin
-                            ? "bg-background text-foreground shadow-sm"
-                            : "text-muted-foreground hover:text-foreground"
+                                ? "bg-background text-foreground shadow-sm"
+                                : "text-muted-foreground hover:text-foreground"
                             }`}
                     >
                         Create account
@@ -299,7 +243,7 @@ export default function AuthForm({
                     onSubmit={handleSubmit}
                     className="space-y-4"
                 >
-                    {/* Names */}
+                    {/* Names for Signup */}
                     {!isLogin && (
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div className="space-y-2">
@@ -373,13 +317,10 @@ export default function AuthForm({
                                 Password
                             </Label>
 
-                            {isLogin && (
-                                <button
-                                    type="button"
-                                    className="text-xs font-medium text-primary hover:underline"
-                                >
-                                    Forgot password?
-                                </button>
+                            {!isLogin && (
+                                <span className="text-[11px] text-muted-foreground">
+                                    Min 8 chars, 1 upper, 1 number, 1 symbol
+                                </span>
                             )}
                         </div>
 
@@ -426,14 +367,14 @@ export default function AuthForm({
                         </div>
                     </div>
 
-                    {/* Errors */}
+                    {/* Validation or Redux Error */}
                     {(validationError || error) && (
                         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
                             {validationError || error}
                         </div>
                     )}
 
-                    {/* Submit */}
+                    {/* Submit Button */}
                     <Button
                         type="submit"
                         disabled={loading}
@@ -441,7 +382,7 @@ export default function AuthForm({
                     >
                         {loading ? (
                             <span className="flex items-center gap-2">
-                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
+                                <Loader2 className="h-4 w-4 animate-spin" />
                                 {isLogin
                                     ? "Signing in..."
                                     : "Creating account..."}
@@ -454,7 +395,7 @@ export default function AuthForm({
                     </Button>
                 </form>
 
-                {/* Bottom */}
+                {/* Bottom Disclaimer */}
                 <div className="mt-7 border-t border-border/60 pt-5 text-center">
                     <p className="text-xs leading-5 text-muted-foreground">
                         By continuing, you agree to use HealthMate
@@ -462,6 +403,6 @@ export default function AuthForm({
                     </p>
                 </div>
             </CardContent>
-        </Card >
+        </Card>
     );
 }
