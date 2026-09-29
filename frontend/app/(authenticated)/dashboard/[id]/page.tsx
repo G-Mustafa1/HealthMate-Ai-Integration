@@ -40,9 +40,8 @@ const ReportPage = () => {
         error,
     } = useSelector((state: RootState) => state.reports);
 
-    const id = Array.isArray(params.id)
-        ? params.id[0]
-        : params.id;
+    const rawId = params?.id;
+    const id = Array.isArray(rawId) ? rawId[0] : rawId;
 
     useEffect(() => {
         if (id) {
