@@ -15,6 +15,12 @@ const app = express();
 app.use(cors({
   origin: ['https://health-mate-ai-integration-s7fj.vercel.app'], // Use environment variable or default to localhost
   credentials: true,// Allow cookies to be sent with requests
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+  ],
 }));
 
 
