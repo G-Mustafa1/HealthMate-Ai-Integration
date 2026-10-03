@@ -319,81 +319,86 @@ authRouter.post('/resend-email-otp', async (req, res) => {
 
 // LOGIN
 
-authRouter.post('/login', async (req, res) => {
+authRouter.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
-                error: "Email and password are required"
+                error: "Email and password are required",
             });
         }
-
 
         const user = await User.findOne({ email });
 
         if (!user) {
             return res.status(404).json({
                 success: false,
-                error: "User not found, signup first"
+                error: "User not found, signup first",
             });
         }
 
         if (!user.isEmailVerified) {
             return res.status(401).json({
                 success: false,
-                error: "Please verify your email first"
+                error: "Please verify your email first",
             });
         }
 
-        // Check password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await bcrypt.compare(
+            password,
+            user.password
+        );
 
         if (!isPasswordValid) {
             return res.status(401).json({
                 success: false,
-                error: "Invalid credentials"
+                error: "Invalid credentials",
             });
         }
 
-        // GENERATE TOKENS
-
+        // Generate tokens
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
 
-        // CREATE / UPDATE SESSION (upsert — prevents session accumulation)
-
+        // Save session
         await Secession.findOneAndUpdate(
             { userId: user._id },
             {
                 userId: user._id,
                 refreshToken,
-                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+                expiresAt: new Date(
+                    Date.now() + 24 * 60 * 60 * 1000
+                ),
             },
             {
                 upsert: true,
-                new: true
+                new: true,
             }
         );
 
-        // ACCESS TOKEN COOKIE
+        // Set access token cookie
+        res.cookie(
+            "accessToken",
+            accessToken,
+            getCookieOptions({
+                maxAge: 15 * 60 * 1000,
+            })
+        );
 
-        res.cookie("accessToken", accessToken, getCookieOptions({
-            maxAge: 15 * 60 * 1000
-        }));
+        // Set refresh token cookie
+        res.cookie(
+            "refreshToken",
+            refreshToken,
+            getCookieOptions({
+                maxAge: 24 * 60 * 60 * 1000,
+            })
+        );
 
-        // REFRESH TOKEN COOKIE
-
-        res.cookie("refreshToken", refreshToken, getCookieOptions({
-            maxAge: 24 * 60 * 60 * 1000
-        }));
-
-        // Login notification
-        sendLoginNotification(user.email).catch(error => {
-
-            console.error("❌ Login notification email error:", error.message);
-
+        // Don't let email failure break login
+        sendLoginNotification(user.email).catch((error) => {
+            console.error("❌ Login notification error:",error.message);
         });
 
         return res.status(200).json({
@@ -404,23 +409,20 @@ authRouter.post('/login', async (req, res) => {
                 firstname: user.firstname,
                 lastname: user.lastname,
                 email: user.email,
-                isEmailVerified: user.isEmailVerified
-            }
+                isEmailVerified: user.isEmailVerified,
+            },
         });
 
     } catch (error) {
-
-        console.error(
-            "❌ Error during login:",
-            error.message
-        );
+        console.error("❌ LOGIN ERROR:", error);
 
         return res.status(500).json({
             success: false,
-            error: "Error during login"
+            error: error.message,
         });
     }
 });
+
 
 
 // REFRESH TOKEN

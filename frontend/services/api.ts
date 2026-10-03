@@ -89,17 +89,33 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Auth endpoints par 401 ko refresh mat karo
+    const isAuthRequest =
+      originalRequest?.url === "/auth/login" ||
+      originalRequest?.url === "/auth/signup" ||
+      originalRequest?.url === "/auth/verify-email-otp" ||
+      originalRequest?.url === "/auth/forgot-password" ||
+      originalRequest?.url === "/auth/verify-reset-otp" ||
+      originalRequest?.url === "/auth/reset-password";
+
+    if (isAuthRequest) {
+      return Promise.reject(error);
+    }
+
     // Refresh endpoint khud fail ho to dobara refresh mat karo
     if (originalRequest?.url === "/auth/refresh") {
       return Promise.reject(error);
     }
 
-    // Sirf 401 par refresh try karo
+    // Sirf 401 par refresh
     if (error.response?.status !== 401) {
       return Promise.reject(error);
     }
 
-    // Agar same time multiple requests 401 dein
+    if (originalRequest?._retry) {
+      return Promise.reject(error);
+    }
+
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
         failedQueue.push({
@@ -115,24 +131,20 @@ axiosInstance.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      // Refresh token cookie browser automatically bhejega
       await axiosInstance.post("/auth/refresh");
 
       processQueue();
 
-      // New accessToken cookie mein set ho chuka hai
-      // Original request dobara bhejo
       return axiosInstance(originalRequest);
-
     } catch (refreshError) {
       processQueue(refreshError);
 
       return Promise.reject(refreshError);
-
     } finally {
       isRefreshing = false;
     }
   }
 );
+
 
 export default axiosInstance;
