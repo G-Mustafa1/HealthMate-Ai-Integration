@@ -3,27 +3,60 @@ const { User } = require('../models/user');
 
 const userAuth = async (req, res, next) => {
     try {
-        const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+        const token = req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
+
         if (!token) {
-            return res.status(401).send('Login first');  
+            return res.status(401).json({
+                success: false,
+                error: "Login first"
+            });
         }
 
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        let decoded;
+
+        try {
+            decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        } catch (error) {
+
+            if (error.name === "TokenExpiredError") {
+                return res.status(401).json({
+                    success: false,
+                    error: "Access token expired",
+                    isExpired: true
+                });
+            }
+
+            return res.status(401).json({
+                success: false,
+                error: "Invalid access token"
+            });
+        }
+
         const { id } = decoded;
-        const user = await User.findById(id);
+
+        const user = await User.findById(id).select("-password");
 
         if (!user) {
-            return res.status(404).send('User not found');
+            return res.status(404).json({
+                success: false,
+                error: "User not found"
+            });
         }
 
         req.user = user;
+
         next();
 
     } catch (error) {
-        console.error('Authentication error:', error);
-        res.status(401).send(error, error.message);
+
+        console.error("❌ Authentication error:", error);
+
+        return res.status(500).json({
+            success: false,
+            error: "Authentication failed"
+        });
     }
-}
+};
 
 module.exports = {
     userAuth

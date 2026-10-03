@@ -17,13 +17,16 @@
     "cloudinary": "^1.41.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "handlebars": "^4.7.9",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.4",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
     "node-fetch": "^3.3.2",
+    "nodemailer": "^10.0.12",
     "uuid": "^13.0.0",
     "validator": "^13.15.15"
   }

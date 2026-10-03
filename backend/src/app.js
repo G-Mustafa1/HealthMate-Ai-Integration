@@ -9,6 +9,8 @@ const { profileRouter } = require('./router/profile');
 const { authRouter } = require('./router/auth');
 const { reportRouter } = require('./router/report');
 const { vitalsRouter } = require('./router/vitial');
+const { generateRefreshToken } = require('./utils/token');
+const  mongoose  = require('mongoose');
 
 const app = express();
 
@@ -20,9 +22,11 @@ app.use(cors({
   
 }));
 
+// console.log("DB:", mongoose.connection.name);
+// console.log("RefreshToken indexes:", await generateRefreshToken.collection.indexes());
 
 app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true })); 
 app.use(cookieParser());
 
 

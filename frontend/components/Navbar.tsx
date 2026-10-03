@@ -52,7 +52,7 @@ export default function Navbar() {
     const [open, setOpen] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
 
-    const { user, loading: authLoading } = useSelector(
+    const { user, loading: authCheckLoading } = useSelector(
         (state: RootState) => state.auth
     );
 
@@ -202,7 +202,7 @@ export default function Navbar() {
                                 transition-all
                                 duration-300
                                 ease-out
-                                ${active ? "w-[calc(100%-1.5rem)]" : "w-0 group-hover:w-[calc(100%-1.5rem)]"}
+                                ${active ? "" : "w-0 group-hover:w-[calc(100%-1.5rem)]"}
                             `}
                         />
                     )}
@@ -248,7 +248,7 @@ export default function Navbar() {
 
                 {/* Desktop Actions */}
                 <div className="hidden items-center gap-3 md:flex">
-                    {authLoading ? (
+                    {authCheckLoading ? (
                         <div className="flex items-center gap-2">
                             <div className="h-9 w-9 animate-pulse rounded-full bg-muted" />
                             <div className="h-4 w-20 animate-pulse rounded bg-muted" />

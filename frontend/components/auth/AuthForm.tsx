@@ -26,13 +26,14 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
 import { AppDispatch, RootState } from "@/redux/store";
-import { clearError } from "@/redux/features/auth/authSlice";
+import { allowEmailVerification, clearError } from "@/redux/features/auth/authSlice";
 import {
     loginUser,
     signupUser,
 } from "@/redux/features/auth/authThunks";
 
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 interface AuthFormProps {
     isLogin: boolean;
@@ -60,12 +61,6 @@ export default function AuthForm({
         password: "",
     });
 
-    useEffect(() => {
-        if (user) {
-            router.replace("/dashboard");
-        }
-    }, [user, router]);
-
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement>
     ) => {
@@ -86,9 +81,7 @@ export default function AuthForm({
     const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 
-    const handleSubmit = async (
-        e: React.FormEvent<HTMLFormElement>
-    ) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         setValidationError("");
@@ -98,18 +91,6 @@ export default function AuthForm({
         const lastname = form.lastname.trim();
         const email = form.email.trim();
         const password = form.password;
-
-        if (!isLogin) {
-            if (!firstname || firstname.length < 2) {
-                setValidationError("Please enter a valid first name.");
-                return;
-            }
-
-            if (!lastname || lastname.length < 2) {
-                setValidationError("Please enter a valid last name.");
-                return;
-            }
-        }
 
         if (!email) {
             setValidationError("Email address is required.");
@@ -145,12 +126,12 @@ export default function AuthForm({
                 return;
             }
 
-            await dispatch(
-                signupUser({ firstname, lastname, email, password, })).unwrap();
+            await dispatch(signupUser({ firstname, lastname, email, password, })).unwrap();
 
-            toast.success("Account created successfully! Please sign in.");
+            dispatch(allowEmailVerification());
 
-            setIsLogin(true);
+            toast.success("OTP sent to your email");
+            router.replace(`/email-verification?email=${encodeURIComponent(email)}`);
 
             setForm({
                 firstname: "",
@@ -161,7 +142,8 @@ export default function AuthForm({
 
             setShowPassword(false);
         } catch (err: any) {
-            toast.error("Invalid credentials");
+            const errorMessage = err;
+            toast.error(errorMessage || "An error occurred. Please try again.");
         }
     };
 
@@ -218,8 +200,8 @@ export default function AuthForm({
                             if (!isLogin) handleToggle();
                         }}
                         className={`rounded-lg py-2.5 text-sm font-medium transition-all ${isLogin
-                                ? "bg-background text-foreground shadow-sm"
-                                : "text-muted-foreground hover:text-foreground"
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
                             }`}
                     >
                         Sign in
@@ -231,8 +213,8 @@ export default function AuthForm({
                             if (isLogin) handleToggle();
                         }}
                         className={`rounded-lg py-2.5 text-sm font-medium transition-all ${!isLogin
-                                ? "bg-background text-foreground shadow-sm"
-                                : "text-muted-foreground hover:text-foreground"
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
                             }`}
                     >
                         Create account
@@ -317,7 +299,14 @@ export default function AuthForm({
                                 Password
                             </Label>
 
-                            {!isLogin && (
+                            {isLogin ? (
+                                <Link
+                                    href="/forgot-password"
+                                    className="text-xs font-medium text-primary hover:underline"
+                                >
+                                    Forgot password?
+                                </Link>
+                            ) : (
                                 <span className="text-[11px] text-muted-foreground">
                                     Min 8 chars, 1 upper, 1 number, 1 symbol
                                 </span>
