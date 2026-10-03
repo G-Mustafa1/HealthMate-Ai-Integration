@@ -21,9 +21,7 @@ const ResetOtp = () => {
   }
 
   return (
-    <AuthLayout>
       <OtpVerification />
-    </AuthLayout>
   )
 }
 

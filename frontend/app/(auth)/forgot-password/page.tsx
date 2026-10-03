@@ -6,9 +6,9 @@ import ForgotPassword from '@/components/forgot-password/ForgotPassword'
 
 const Forgot = () => {
     return (
-        <AuthLayout>
+        // <AuthLayout>
             <ForgotPassword />
-        </AuthLayout>
+        // </AuthLayout>
     )
 }
 

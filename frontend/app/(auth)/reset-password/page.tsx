@@ -20,9 +20,7 @@ const ResetPassword = () => {
         return null;
     }
     return (
-        <AuthLayout>
-            <ChangePassword />
-        </AuthLayout>
+        <ChangePassword />
     )
 }
 

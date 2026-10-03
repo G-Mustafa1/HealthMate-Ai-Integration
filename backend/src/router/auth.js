@@ -375,7 +375,6 @@ authRouter.post('/login', async (req, res) => {
         // REFRESH TOKEN COOKIE
 
         res.cookie("refreshToken", refreshToken, getCookieOptions({
-            path: "/",
             maxAge: 24 * 60 * 60 * 1000
         }));
 
@@ -520,7 +519,6 @@ authRouter.post('/refresh', async (req, res) => {
         // SET NEW REFRESH TOKEN
 
         res.cookie("refreshToken", newRefreshToken, getCookieOptions({
-            path: "/",
             maxAge: 24 * 60 * 60 * 1000
         }));
 
@@ -835,22 +833,16 @@ authRouter.post('/logout', async (req, res) => {
     try {
         const refreshToken = req.cookies?.refreshToken;
 
-        console.log(refreshToken);
-
 
         // Delete all sessions of this user
         if (refreshToken) {
-            const deletedSession = await Secession.deleteOne({ refreshToken });
+            await Secession.deleteOne({ refreshToken });
         }
         // Clear access token
-        res.clearCookie("accessToken", getCookieOptions({
-            path: "/"
-        }));
+        res.clearCookie("accessToken", getCookieOptions());
 
         // Clear refresh token
-        res.clearCookie("refreshToken", getCookieOptions({
-            path: "/"
-        }));
+        res.clearCookie("refreshToken", getCookieOptions());
 
         return res.status(200).json({
             success: true,

@@ -54,14 +54,15 @@ export default function AuthLayout({
             </div>
 
             <div className="absolute left-4 top-4 z-20 sm:left-6 sm:top-6 lg:left-8 lg:top-8">
-                <Link
-                    href="/"
-                    aria-label="Back to HealthMate home"
+                <button
+                    type="button"
+                    onClick={() => router.back()}
+                    aria-label="Go back"
                     className="group inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/85 px-4 py-2 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur-xl transition-all duration-200 hover:-translate-x-0.5 hover:border-primary/30 hover:bg-primary/5 hover:text-primary hover:shadow-md sm:text-sm"
                 >
                     <ArrowLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
-                    <span>Back to Home</span>
-                </Link>
+                    <span>Back</span>
+                </button>
             </div>
 
             <div className="relative z-10 min-h-screen">

@@ -23,8 +23,6 @@ export default function EmailVerificationPage() {
     }
 
     return (
-        <AuthLayout>
-            <EmailVerification />
-        </AuthLayout>
+        <EmailVerification />
     );
 }
