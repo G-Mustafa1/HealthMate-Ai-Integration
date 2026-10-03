@@ -14,12 +14,23 @@ const { sendSignupOTP, sendLoginNotification, sendForgotPasswordOTP, sendPasswor
 
 const { generateAccessToken, generateRefreshToken } = require('../utils/token');
 
+// const getCookieOptions = (extraOptions = {}) => {
+//     const isProduction = process.env.NODE_ENV === "production";
+//     return {
+//         httpOnly: true,
+//         secure: isProduction,
+//         sameSite: isProduction ? "none" : "lax",
+//         path: "/",
+//         ...extraOptions
+//     };
+// };
+
+
 const getCookieOptions = (extraOptions = {}) => {
-    const isProduction = process.env.NODE_ENV === "production";
     return {
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? "none" : "lax",
+        secure: true, // Set to true in production
+        sameSite: "none", // Set to "none" in production
         path: "/",
         ...extraOptions
     };
