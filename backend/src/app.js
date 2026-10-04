@@ -15,14 +15,15 @@ const app = express();
 app.use(cors({
   origin: [process.env.CLIENT_URL], // Use environment variable or default to localhost
   credentials: true,// Allow cookies to be sent with requests
-  // methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  // allowedHeaders: ["Content-Type", "Authorization",],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization",],
 }));
 
 
 app.use(express.json());
 app.use(cookieParser());
 
+connectDB();
 
 app.use('/auth', authRouter);
 app.use('/profile', profileRouter);
@@ -37,7 +38,6 @@ app.get('/about', (req, res) => {
   res.send('About route 🎉')
 })
 
-connectDB();
 
 const PORT = process.env.PORT || 3000;
 
