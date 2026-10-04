@@ -38,9 +38,7 @@ const DashboardMain = () => {
     return (
         <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 
-            {/* ================================= */}
             {/* WELCOME HEADER */}
-            {/* ================================= */}
             <section className="relative mb-8 overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
 
                 <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
@@ -87,9 +85,7 @@ const DashboardMain = () => {
                 </div>
             </section>
 
-            {/* ================================= */}
             {/* QUICK STATS */}
-            {/* ================================= */}
             <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
                 {/* Total Reports */}
@@ -171,9 +167,7 @@ const DashboardMain = () => {
 
             </section>
 
-            {/* ================================= */}
             {/* QUICK ACTIONS */}
-            {/* ================================= */}
             <section className="mb-8">
                 <div className="mb-4">
                     <h2 className="text-lg font-semibold text-foreground sm:text-xl">
@@ -188,9 +182,7 @@ const DashboardMain = () => {
                 <UploadReport />
             </section>
 
-            {/* ================================= */}
             {/* REPORTS LIST */}
-            {/* ================================= */}
             <section>
                 <ReportsList />
             </section>

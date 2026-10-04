@@ -223,34 +223,16 @@ const EmailVerification = () => {
                                     {otp.map((digit, index) => (
                                         <Input
                                             key={index}
-                                            ref={(el) => {
-                                                inputRefs.current[index] =
-                                                    el;
-                                            }}
+                                            ref={(el) => { inputRefs.current[index] = el; }}
                                             value={digit}
-                                            onChange={(e) =>
-                                                handleChange(
-                                                    e.target.value,
-                                                    index
-                                                )
-                                            }
-                                            onKeyDown={(e) =>
-                                                handleKeyDown(
-                                                    e,
-                                                    index
-                                                )
-                                            }
+                                            onChange={(e) => handleChange(e.target.value, index)}
+                                            onKeyDown={(e) => handleKeyDown(e, index)}
                                             onPaste={handlePaste}
                                             inputMode="numeric"
                                             maxLength={1}
-                                            autoComplete={
-                                                index === 0
-                                                    ? "one-time-code"
-                                                    : "off"
-                                            }
+                                            autoComplete={index === 0 ? "one-time-code" : "off"}
                                             disabled={loading}
-                                            aria-label={`OTP digit ${index + 1
-                                                }`}
+                                            aria-label={`OTP digit ${index + 1}`}
                                             className="h-12 w-11 rounded-xl p-0 text-center text-lg font-semibold sm:h-14 sm:w-14"
                                         />
                                     ))}
@@ -263,14 +245,6 @@ const EmailVerification = () => {
                                     {error}
                                 </div>
                             )}
-
-                            {/* Success */}
-                            {/* {message && (
-                                <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-600 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-400">
-                                    <CheckCircle2 className="h-4 w-4 shrink-0" />
-                                    {message}
-                                </div>
-                            )} */}
 
                             {/* Verify */}
                             <Button

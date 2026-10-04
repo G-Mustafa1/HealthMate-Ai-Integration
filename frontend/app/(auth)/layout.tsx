@@ -3,21 +3,13 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-
 import { RootState } from "@/redux/store";
 import LoadingScreen from "@/components/LoadingScreen";
 
-export default function AuthLayout({
-    children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
+export default function AuthLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
     const router = useRouter();
 
-    const { user, authChecked, loading } = useSelector(
-        (state: RootState) => state.auth
-    );
+    const { user, authChecked } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
         if (authChecked && user) {

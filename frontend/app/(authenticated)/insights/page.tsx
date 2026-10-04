@@ -31,9 +31,7 @@ export default function Insights() {
     dispatch(getInsights());
   }, [dispatch]);
 
-  // =========================
   // Loading State
-  // =========================
   if (loading) {
     return (
       <main className="min-h-screen bg-background">
@@ -70,9 +68,7 @@ export default function Insights() {
     <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
 
-        {/* =========================
-        Page Header
-    ========================= */}
+        {/* Page Header */}
         <div className="mb-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>

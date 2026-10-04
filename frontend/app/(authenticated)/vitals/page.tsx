@@ -19,13 +19,6 @@ import {
 import VitalList from "@/components/vital/VitalList";
 import VitalForm from "@/components/vital/VitalForm";
 
-interface FormData {
-  bp: string;
-  sugar: string;
-  weight: string;
-  note: string;
-}
-
 export default function Vitals() {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -88,9 +81,7 @@ export default function Vitals() {
 
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 
-        {/* ================================= */}
         {/* PAGE HEADER */}
-        {/* ================================= */}
         <section className="mb-8">
 
           <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
@@ -108,9 +99,7 @@ export default function Vitals() {
           </p>
         </section>
 
-        {/* ================================= */}
         {/* CONTENT GRID */}
-        {/* ================================= */}
         <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
 
           {/* ADD VITAL FORM */}

@@ -14,6 +14,7 @@ import { RootState } from "@/redux/store";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const footerLinks = [
     {
@@ -33,12 +34,17 @@ export default function Footer() {
         authChecked,
     } = useSelector((state: RootState) => state.auth);
 
-    const handleNewsletter = (
-        e: React.FormEvent<HTMLFormElement>
-    ) => {
+    const handleNewsletter = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         // Add newsletter API here when available.
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        // Reset form
+        e.currentTarget.reset();
+
+        toast.success("Subscribed to newsletter successfully!");
     };
 
     return (
@@ -97,7 +103,7 @@ export default function Footer() {
                         </h3>
 
                         <ul className="space-y-3">
-                            {authChecked  && user ? (
+                            {authChecked && user ? (
                                 footerLinks[0].links.map((link) => (
                                     <li key={link.href}>
                                         <Link
@@ -159,7 +165,7 @@ export default function Footer() {
                             {/* Social Links */}
                             <div className="flex items-center gap-2 pt-2">
                                 <a
-                                    href="#"
+                                    href="https://twitter.com/"
                                     aria-label="Twitter"
                                     className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 bg-background text-muted-foreground transition-all hover:-translate-y-1 hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
                                 >
@@ -167,7 +173,7 @@ export default function Footer() {
                                 </a>
 
                                 <a
-                                    href="#"
+                                    href="http://github.com/"
                                     aria-label="GitHub"
                                     className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 bg-background text-muted-foreground transition-all hover:-translate-y-1 hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
                                 >
@@ -175,7 +181,7 @@ export default function Footer() {
                                 </a>
 
                                 <a
-                                    href="#"
+                                    href="https://www.linkedin.com/"
                                     aria-label="LinkedIn"
                                     className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 bg-background text-muted-foreground transition-all hover:-translate-y-1 hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
                                 >

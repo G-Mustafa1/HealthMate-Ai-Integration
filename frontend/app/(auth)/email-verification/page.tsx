@@ -1,7 +1,4 @@
 "use client";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import AuthLayout from "../layout";
 import EmailVerification from "@/components/verification/EmailVerification";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";

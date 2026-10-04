@@ -25,9 +25,7 @@ const ReportsList = () => {
         (state: RootState) => state.reports
     );
 
-    // ---------------------------------------
     // Format date
-    // ---------------------------------------
     const formatDate = (date?: string) => {
         if (!date) return "Date not available";
 
@@ -44,27 +42,17 @@ const ReportsList = () => {
         });
     };
 
-    // ---------------------------------------
     // Get file type
-    // ---------------------------------------
     const getFileType = (filename?: string) => {
         if (!filename) return "FILE";
 
-        const extension = filename
-            .split(".")
-            .pop()
-            ?.toUpperCase();
+        const extension = filename.split(".").pop()?.toUpperCase();
 
         return extension || "FILE";
     };
 
-    // ---------------------------------------
     // Get title
-    // ---------------------------------------
-    const getReportTitle = (
-        title?: string,
-        filename?: string
-    ) => {
+    const getReportTitle = (title?: string, filename?: string) => {
         if (title?.trim()) {
             return title;
         }
@@ -79,9 +67,7 @@ const ReportsList = () => {
     return (
         <Card className="overflow-hidden border-border/60 bg-card shadow-sm">
 
-            {/* ================================= */}
             {/* HEADER */}
-            {/* ================================= */}
             <CardHeader className="border-b border-border/50 bg-gradient-to-r from-primary/5 via-background to-accent/5 pb-5">
                 <div className="flex items-center justify-between gap-4">
 
@@ -112,9 +98,7 @@ const ReportsList = () => {
 
             <CardContent className="p-4 sm:p-6">
 
-                {/* ================================= */}
                 {/* LOADING */}
-                {/* ================================= */}
                 {loading ? (
                     <div className="space-y-3">
 
@@ -138,9 +122,7 @@ const ReportsList = () => {
                     </div>
                 ) : reports.length === 0 ? (
 
-                    /* ================================= */
                     /* EMPTY STATE */
-                    /* ================================= */
                     <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/70 bg-muted/20 px-6 py-14 text-center">
 
                         <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -168,9 +150,7 @@ const ReportsList = () => {
 
                 ) : (
 
-                    /* ================================= */
                     /* REPORT LIST */
-                    /* ================================= */
                     <div className="space-y-3">
 
                         {reports.map((report) => {

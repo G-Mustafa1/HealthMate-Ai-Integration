@@ -112,9 +112,7 @@ const Reports = () => {
         return extension ? extension.toUpperCase() : "FILE";
     };
 
-    // =========================
     // Loading State
-    // =========================
     if (loading) {
         return (
             <main className="min-h-[calc(100vh-4rem)] bg-muted/20 px-4 py-8 sm:px-6 lg:px-8">

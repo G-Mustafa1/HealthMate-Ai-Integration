@@ -1,6 +1,5 @@
 "use client";
-import React, { useEffect } from 'react'
-import AuthLayout from '../layout'
+import { useEffect } from 'react'
 import OtpVerification from '@/components/verification/OtpVerification'
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';

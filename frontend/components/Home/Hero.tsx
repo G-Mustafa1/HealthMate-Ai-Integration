@@ -44,32 +44,6 @@ const Hero = () => {
                             vitals — all from one simple place.
                         </p>
 
-                        {/* Buttons */}
-                        {/* <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                    <Link href={primaryHref}>
-                      <Button
-                        size="lg"
-                        className="group h-12 w-full rounded-xl px-6 font-semibold shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/25 sm:w-auto"
-                      >
-                        {primaryLabel}
-    
-                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                      </Button>
-                    </Link>
-    
-                    {!user && (
-                      <Link href={LOGIN_ROUTE}>
-                        <Button
-                          size="lg"
-                          variant="outline"
-                          className="h-12 w-full rounded-xl px-6 sm:w-auto"
-                        >
-                          Sign in
-                        </Button>
-                      </Link>
-                    )}
-                  </div> */}
-
                         {/* Trust */}
                         <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-muted-foreground">
                             <span className="flex items-center gap-2">

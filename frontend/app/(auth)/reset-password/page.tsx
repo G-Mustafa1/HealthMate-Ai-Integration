@@ -1,6 +1,5 @@
 "use client";
-import React, { useEffect } from 'react'
-import AuthLayout from '../layout'
+import { useEffect } from 'react'
 import ChangePassword from '@/components/change-password/ChangePassword'
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';

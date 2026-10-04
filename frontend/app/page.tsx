@@ -1,22 +1,13 @@
 "use client";
-import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Home/Hero";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import LoadingScreen from "@/components/LoadingScreen";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-// export const metadata: Metadata = {
-//   title: "HealthMate - Smart AI Health Companion",
-//   description:
-//     "Transform medical reports into clear insights, track vitals effortlessly, and make informed healthcare decisions.",
-// };
-
 const Home = () => {
-  const router = useRouter();
   const { user, loading, authChecked } = useSelector(
     (state: RootState) => state.auth
   );
