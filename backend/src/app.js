@@ -20,10 +20,10 @@ app.use(cors({
 }));
 
 
-// app.use(express.json());
-// app.use(cookieParser());
+app.use(express.json());
+app.use(cookieParser());
 
-// connectDB();
+connectDB();
 
 // app.use('/auth', authRouter);
 // app.use('/profile', profileRouter);
