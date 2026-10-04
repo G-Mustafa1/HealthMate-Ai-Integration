@@ -1,6 +1,5 @@
 const express = require('express');
 const authRouter = express.Router();
-require('dotenv').config();
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -380,27 +379,21 @@ authRouter.post("/login", async (req, res) => {
         );
 
         // Set access token cookie
-        res.cookie(
-            "accessToken",
-            accessToken,
-            getCookieOptions({
-                maxAge: 15 * 60 * 1000,
-            })
+        res.cookie("accessToken", accessToken, getCookieOptions({
+            maxAge: 15 * 60 * 1000,
+        })
         );
 
         // Set refresh token cookie
-        res.cookie(
-            "refreshToken",
-            refreshToken,
-            getCookieOptions({
-                maxAge: 24 * 60 * 60 * 1000,
-            })
+        res.cookie("refreshToken", refreshToken, getCookieOptions({
+            maxAge: 24 * 60 * 60 * 1000,
+        })
         );
 
         // Don't let email failure break login
-        sendLoginNotification(user.email).catch((error) => {
-            console.error("❌ Login notification error:",error.message);
-        });
+        // sendLoginNotification(user.email).catch((error) => {
+        //     console.error("❌ Login notification error:", error.message);
+        // });
 
         return res.status(200).json({
             success: true,
