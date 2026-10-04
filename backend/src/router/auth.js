@@ -391,9 +391,9 @@ authRouter.post("/login", async (req, res) => {
         );
 
         // Don't let email failure break login
-        // sendLoginNotification(user.email).catch((error) => {
-        //     console.error("❌ Login notification error:", error.message);
-        // });
+        sendLoginNotification(user.email).catch((error) => {
+            console.error("❌ Login notification error:", error.message);
+        });
 
         return res.status(200).json({
             success: true,
