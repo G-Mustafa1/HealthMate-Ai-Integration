@@ -12,12 +12,12 @@ const { vitalsRouter } = require('./router/vitial');
 
 const app = express();
 
-// app.use(cors({
-//   origin: [process.env.CLIENT_URL], // Use environment variable or default to localhost
-//   credentials: true,// Allow cookies to be sent with requests
-//   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-//   allowedHeaders: ["Content-Type", "Authorization",],
-// }));
+app.use(cors({
+  origin: [process.env.CLIENT_URL], // Use environment variable or default to localhost
+  credentials: true,// Allow cookies to be sent with requests
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization",],
+}));
 
 
 // app.use(express.json());
