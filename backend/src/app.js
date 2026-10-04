@@ -12,19 +12,15 @@ const { vitalsRouter } = require('./router/vitial');
 
 const app = express();
 
-if (!process.env.CLIENT_URL) {
-  throw new Error("CLIENT_URL environment variable is not defined.");
-}
+console.log(process.env.CLIENT_URL, "Milgeya ✅ ");
+
 
 app.use(cors({
   origin: [process.env.CLIENT_URL], // Use environment variable or default to localhost
   credentials: true,// Allow cookies to be sent with requests
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization",
-  ],
+  allowedHeaders: ["Content-Type", "Authorization",],
 }));
 
 
