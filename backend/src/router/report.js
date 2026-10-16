@@ -6,9 +6,43 @@ const { userAuth } = require('../middleware/authmiddle');
 const { upload, cloudinary } = require('../cloudinary/cloudinary');
 const { analyzeFileBase64 } = require('../gemini-api/gemini');
 
+// Destroy uploaded file on Cloudinary (ignore failures so response still returns)
+const destroyUploadedFile = async (publicId) => {
+    if (!publicId) return;
+
+    try {
+        await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+    } catch (deleteErr) {
+        console.warn('Cloudinary delete error:', deleteErr.message);
+    }
+};
+
+// Wrap multer so size-limit errors return JSON instead of HTML
+const uploadReportFile = (req, res, next) => {
+    upload.single('file')(req, res, (err) => {
+        if (err) {
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                return res.status(413).json({
+                    success: false,
+                    message: 'File is too large. Maximum allowed size is 10MB.'
+                });
+            }
+
+            return res.status(400).json({
+                success: false,
+                message: err.message || 'File upload failed'
+            });
+        }
+
+        next();
+    });
+};
+
 
 // ✅ Upload Medical Report
-reportRouter.post('/upload', userAuth, upload.single('file'), async (req, res) => {
+reportRouter.post('/upload', userAuth, uploadReportFile, async (req, res) => {
+    let reportSaved = false;
+
     try {
         if (!req.file) {
             return res.status(400).json({ success: false, message: 'Medical report file is required' });
@@ -17,11 +51,13 @@ reportRouter.post('/upload', userAuth, upload.single('file'), async (req, res) =
         const fileUrl = req.file.path;
         const publicId = req.file.filename;
         const mimeType = req.file.mimetype;
-        const resourceType = mimeType === 'application/pdf' ? 'raw' : 'image';
+        const resourceType = 'image';
 
         const fileResponse = await fetch(fileUrl);
 
         if (!fileResponse.ok) {
+            await destroyUploadedFile(publicId);
+
             return res.status(400).json({ success: false, message: 'Unable to read uploaded file' });
         }
 
@@ -31,11 +67,7 @@ reportRouter.post('/upload', userAuth, upload.single('file'), async (req, res) =
         const ai = await analyzeFileBase64(base64File, mimeType);
 
         if (!ai?.ok) {
-            try {
-                await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
-            } catch (deleteErr) {
-                console.warn('Cloudinary delete error:', deleteErr.message);
-            }
+            await destroyUploadedFile(publicId);
 
             return res.status(500).json({
                 success: false,
@@ -44,11 +76,7 @@ reportRouter.post('/upload', userAuth, upload.single('file'), async (req, res) =
         }
 
         if (!ai.isMedicalReport) {
-            try {
-                await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
-            } catch (deleteErr) {
-                console.warn('Cloudinary delete error:', deleteErr.message);
-            }
+            await destroyUploadedFile(publicId);
 
             return res.status(400).json({
                 success: false,
@@ -71,6 +99,8 @@ reportRouter.post('/upload', userAuth, upload.single('file'), async (req, res) =
             suggested_questions: ai.parsed.suggested_questions || []
         });
 
+        reportSaved = true;
+
         return res.status(200).json({
             success: true,
             message: 'Medical report uploaded successfully ✅',
@@ -79,6 +109,10 @@ reportRouter.post('/upload', userAuth, upload.single('file'), async (req, res) =
 
     } catch (err) {
         console.error('❌ Upload Error:', err);
+
+        if (req.file && !reportSaved) {
+            await destroyUploadedFile(req.file.filename);
+        }
 
         return res.status(500).json({
             success: false,
@@ -122,9 +156,25 @@ reportRouter.delete('/:id', userAuth, async (req, res) => {
         }
 
         if (report.public_id) {
-            const deleteResult = await cloudinary.uploader.destroy(report.public_id, {
-                resource_type: report.resource_type || 'image'
-            });
+            try {
+                const deleteResult = await cloudinary.uploader.destroy(report.public_id, {
+                    resource_type: 'image'
+                });
+
+                if (deleteResult?.result !== 'ok' && deleteResult?.result !== 'not found') {
+                    return res.status(500).json({
+                        success: false,
+                        message: 'Failed to delete report file from Cloudinary'
+                    });
+                }
+            } catch (deleteErr) {
+                console.error('Cloudinary delete error:', deleteErr.message);
+
+                return res.status(500).json({
+                    success: false,
+                    message: 'Failed to delete report file from Cloudinary'
+                });
+            }
         }
 
         await Report.findByIdAndDelete(report._id);

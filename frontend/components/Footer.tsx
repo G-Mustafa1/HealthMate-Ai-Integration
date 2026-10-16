@@ -15,6 +15,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { useState } from "react";
 
 const footerLinks = [
     {
@@ -34,17 +35,28 @@ export default function Footer() {
         authChecked,
     } = useSelector((state: RootState) => state.auth);
 
+    const [loading, setLoading] = useState(false);
+    const [email, setEmail] = useState("");
+
     const handleNewsletter = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Add newsletter API here when available.
+        if (!email.trim()) {
+            toast.error("Please enter your email address.");
+            return;
+        }
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setLoading(true);
 
-        // Reset form
-        e.currentTarget.reset();
-
-        toast.success("Subscribed to newsletter successfully!");
+        try {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            toast.success("Subscribed to newsletter successfully!");
+            setEmail("");
+        } catch (error) {
+            toast.error("Subscription failed. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -209,6 +221,8 @@ export default function Footer() {
                             <Input
                                 type="email"
                                 name="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 placeholder="you@example.com"
                                 required
                                 className="h-10 bg-background"
@@ -216,6 +230,7 @@ export default function Footer() {
 
                             <Button
                                 type="submit"
+                                disabled={loading}
                                 className="h-10 w-full gap-2"
                             >
                                 Subscribe
@@ -231,7 +246,7 @@ export default function Footer() {
                 {/* ================= BOTTOM BAR ================= */}
                 <div className="flex flex-col gap-4 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
 
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground" suppressHydrationWarning>
                         © {new Date().getFullYear()} HealthMate. All
                         rights reserved.
                     </p>

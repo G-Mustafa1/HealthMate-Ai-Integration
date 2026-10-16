@@ -126,7 +126,7 @@ export default function Navbar() {
                     typeof error === "string"
                         ? error
                         : error?.message ||
-                          "Something went wrong while logging out.",
+                        "Something went wrong while logging out.",
                 icon: "error",
                 confirmButtonColor: "#2563eb",
                 customClass: {
@@ -165,15 +165,13 @@ export default function Navbar() {
                         group relative flex items-center gap-2
                         font-medium
                         transition-colors duration-200
-                        ${
-                            mobile
-                                ? "w-full rounded-lg px-3 py-2.5 text-sm"
-                                : "px-3 py-2 text-sm"
+                        ${mobile
+                            ? "w-full rounded-lg px-3 py-2.5 text-sm"
+                            : "px-3 py-2 text-sm"
                         }
-                        ${
-                            active
-                                ? "text-primary font-semibold"
-                                : "text-muted-foreground hover:text-foreground"
+                        ${active
+                            ? "text-primary font-semibold"
+                            : "text-muted-foreground hover:text-foreground"
                         }
                         ${mobile && active ? "bg-primary/10 text-primary" : ""}
                     `}
@@ -256,10 +254,21 @@ export default function Navbar() {
                     ) : isAuthenticated ? (
                         <>
                             {/* Profile */}
-                            <div className="flex items-center gap-2">
-                                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-sm shadow-primary/20">
-                                    {initials}
-                                </div>
+                            <Link
+                                href="/profile"
+                                className="group flex items-center gap-2 rounded-xl px-2 py-1.5 transition-colors hover:bg-muted/70"
+                            >
+                                {user?.profilePicture ? (
+                                    <img
+                                        src={user.profilePicture}
+                                        alt={fullName}
+                                        className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-primary/30 shadow-sm transition-transform group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 text-sm font-bold text-primary-foreground shadow-sm shadow-primary/20 transition-transform group-hover:scale-105">
+                                        {initials}
+                                    </div>
+                                )}
 
                                 <div className="hidden lg:block">
                                     <p className="max-w-[120px] truncate text-sm font-semibold text-foreground">
@@ -267,10 +276,11 @@ export default function Navbar() {
                                     </p>
 
                                     <p className="text-[10px] text-muted-foreground">
-                                        HealthMate User
+                                        View profile
                                     </p>
                                 </div>
-                            </div>
+                            </Link>
+
 
                             {/* Logout */}
                             <Button
@@ -356,10 +366,9 @@ export default function Navbar() {
                     overflow-hidden border-t border-border/60
                     bg-background md:hidden
                     transition-all duration-300 ease-in-out
-                    ${
-                        open
-                            ? "max-h-[700px] opacity-100"
-                            : "max-h-0 opacity-0"
+                    ${open
+                        ? "max-h-[700px] opacity-100"
+                        : "max-h-0 opacity-0"
                     }
                 `}
             >
@@ -369,11 +378,19 @@ export default function Navbar() {
 
                             {/* Mobile Profile */}
                             <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-muted/30 p-3">
-                                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground shadow-sm shadow-primary/20">
-                                    {initials || (
-                                        <User className="h-5 w-5" />
-                                    )}
-                                </div>
+                                {user?.profilePicture ? (
+                                    <img
+                                        src={user.profilePicture}
+                                        alt={fullName}
+                                        className="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-primary/30 shadow-sm"
+                                    />
+                                ) : (
+                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 font-bold text-primary-foreground shadow-sm shadow-primary/20">
+                                        {initials || (
+                                            <User className="h-5 w-5" />
+                                        )}
+                                    </div>
+                                )}
 
                                 <div className="min-w-0">
                                     <p className="truncate font-semibold">

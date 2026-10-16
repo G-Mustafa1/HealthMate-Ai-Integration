@@ -232,12 +232,13 @@ export default function AuthForm({
                                 <Label htmlFor="firstname">
                                     First name
                                 </Label>
-
                                 <div className="relative">
                                     <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 
                                     <Input
                                         id="firstname"
+                                        type="text"
+                                        name="firstname"
                                         value={form.firstname}
                                         onChange={handleChange}
                                         placeholder="John"
@@ -258,6 +259,8 @@ export default function AuthForm({
 
                                     <Input
                                         id="lastname"
+                                        type="text"
+                                        name="lastname"
                                         value={form.lastname}
                                         onChange={handleChange}
                                         placeholder="Doe"
@@ -282,6 +285,7 @@ export default function AuthForm({
                             <Input
                                 id="email"
                                 type="email"
+                                name="email"
                                 value={form.email}
                                 onChange={handleChange}
                                 placeholder="you@example.com"
@@ -323,6 +327,7 @@ export default function AuthForm({
                                         ? "text"
                                         : "password"
                                 }
+                                name="password"
                                 value={form.password}
                                 onChange={handleChange}
                                 placeholder="••••••••"

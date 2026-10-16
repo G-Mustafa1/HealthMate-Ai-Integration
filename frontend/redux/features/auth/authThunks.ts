@@ -7,6 +7,8 @@ export interface User {
   firstname: string;
   lastname: string;
   email: string;
+  isEmailVerified?: boolean;
+  profilePicture?: string | null;
 }
 
 interface LoginData {

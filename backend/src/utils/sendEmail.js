@@ -3,6 +3,7 @@ const handlebars = require("handlebars");
 const fs = require("fs");
 const path = require("path");
 
+// ✅ Transporter ko top par rakhna best practice hai (Performance behtar hoti hai)
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -15,11 +16,8 @@ const transporter = nodemailer.createTransport({
  * Load and compile Handlebars email template
  */
 const loadTemplate = (templateName, data = {}) => {
-    const templatePath = path.join(
-        __dirname,
-        "../templates/emails",
-        `${templateName}.hbs`
-    );
+    // ✅ CommonJS mein __dirname pehle se built-in hota hai
+    const templatePath = path.join(__dirname, "../templates/emails", `${templateName}.hbs`);
 
     const templateSource = fs.readFileSync(templatePath, "utf-8");
 
@@ -36,18 +34,17 @@ const loadTemplate = (templateName, data = {}) => {
  */
 const sendEmail = async (to, subject, html) => {
     try {
-        const info = await transporter.sendMail({
+        const mailOptions = {
             from: `"HealthMate" <${process.env.MAIL_USER}>`,
-            to,
+            to: to,
             subject,
             html,
-        });
+        };
 
-        console.log("✅ Email sent:", to);
-
+        const info = await transporter.sendMail(mailOptions);
         return info;
     } catch (error) {
-        console.error("❌ Email error:", error.message);
+        console.error("❌ Email error:", error);
         throw error;
     }
 };
@@ -61,11 +58,7 @@ const sendSignupOTP = async (email, otp) => {
         expiresIn: 10,
     });
 
-    return sendEmail(
-        email,
-        "Verify your HealthMate email",
-        html
-    );
+    return sendEmail(email, "Verify your HealthMate email", html);
 };
 
 /**
@@ -74,11 +67,7 @@ const sendSignupOTP = async (email, otp) => {
 const sendLoginNotification = async (email) => {
     const html = loadTemplate("login-notification");
 
-    return sendEmail(
-        email,
-        "New login to your HealthMate account",
-        html
-    );
+    return sendEmail(email, "New login to your HealthMate account", html);
 };
 
 /**
@@ -90,11 +79,7 @@ const sendForgotPasswordOTP = async (email, otp) => {
         expiresIn: 10,
     });
 
-    return sendEmail(
-        email,
-        "Reset your HealthMate password",
-        html
-    );
+    return sendEmail(email, "Reset your HealthMate password", html);
 };
 
 /**
@@ -103,13 +88,10 @@ const sendForgotPasswordOTP = async (email, otp) => {
 const sendPasswordChangedEmail = async (email) => {
     const html = loadTemplate("password-changed");
 
-    return sendEmail(
-        email,
-        "Your HealthMate password was changed",
-        html
-    );
+    return sendEmail(email, "Your HealthMate password was changed", html);
 };
 
+// ✅ CommonJS Export Syntax
 module.exports = {
     sendSignupOTP,
     sendLoginNotification,

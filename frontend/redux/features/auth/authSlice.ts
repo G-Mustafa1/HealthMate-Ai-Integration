@@ -13,6 +13,7 @@ import {
   verifyResetOTP,
   resendEmailOTP,
 } from "./authThunks";
+import { getProfilePictureUrl, updateProfile } from "../profile/profileThunks";
 
 interface AuthState {
   // Auth
@@ -227,6 +228,7 @@ const authSlice = createSlice({
       })
 
       .addCase(logoutUser.fulfilled, (state) => {
+        state.loading = false;
         state.user = null;
         state.authChecked = true;
         state.error = null;
@@ -235,6 +237,20 @@ const authSlice = createSlice({
       .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Logout failed";
+      })
+
+      // PROFILE UPDATED — keep auth user (navbar/header) in sync
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        if (state.user && action.payload.user) {
+          state.user = {
+            ...state.user,
+            firstname: action.payload.user.firstname,
+            lastname: action.payload.user.lastname,
+            profilePicture: action.payload.profile
+              ? getProfilePictureUrl(action.payload.profile.profilePicture)
+              : (state.user.profilePicture ?? null),
+          };
+        }
       })
 
       // GET USER (initial session check only)

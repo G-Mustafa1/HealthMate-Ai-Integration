@@ -132,6 +132,7 @@ export const deleteReport = createAsyncThunk<
       return id;
     } catch (error: any) {
       return rejectWithValue(
+        error.response?.data?.message ||
         error.response?.data?.error ||
         "Failed to delete report"
       );

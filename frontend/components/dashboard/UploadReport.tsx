@@ -45,6 +45,23 @@ const UploadReport = () => {
             "image/jpeg",
         ];
 
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
+        if (file.size > MAX_FILE_SIZE) {
+            Swal.fire({
+                icon: "error",
+                title: "File Too Large",
+                text: "Maximum allowed file size is 10MB.",
+                confirmButtonColor: "#2563eb",
+                customClass: {
+                    popup: "rounded-2xl",
+                },
+            });
+
+            e.target.value = "";
+            return;
+        }
+
         if (!allowedTypes.includes(file.type)) {
             Swal.fire({
                 icon: "error",
@@ -72,8 +89,11 @@ const UploadReport = () => {
                     popup: "rounded-2xl",
                 },
             });
-        } catch (err: any) {
-            const message = err?.message || "Unable to upload and analyze the report.";
+        } catch (err) {
+            const message =
+                (typeof err === "string" && err) ||
+                (err instanceof Error && err.message) ||
+                "Only Medical reports are allowed.";
             Swal.fire({
                 icon: "error",
                 title: "Upload Failed",
@@ -108,7 +128,7 @@ const UploadReport = () => {
                     </CardTitle>
 
                     <CardDescription>
-                        Upload a medical report PDF or Image for AI analysis.
+                        Upload a medical report PDF or Image (max 10MB) for AI analysis.
                     </CardDescription>
                 </CardHeader>
 

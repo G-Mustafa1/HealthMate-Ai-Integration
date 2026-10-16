@@ -60,11 +60,6 @@ const userSchema = new Schema(
             type: Date,
             default: null
         },
-        gender: {
-            type: String,
-            enum: ["Male", "Female", "Other"],
-            default: undefined
-        }
     },
     {
         collection: 'users',

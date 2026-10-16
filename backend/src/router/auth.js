@@ -14,18 +14,6 @@ const { sendSignupOTP, sendLoginNotification, sendForgotPasswordOTP, sendPasswor
 
 const { generateAccessToken, generateRefreshToken } = require('../utils/token');
 
-// const getCookieOptions = (extraOptions = {}) => {
-//     const isProduction = process.env.NODE_ENV === "production";
-//     return {
-//         httpOnly: true,
-//         secure: isProduction,
-//         sameSite: isProduction ? "none" : "lax",
-//         path: "/",
-//         ...extraOptions
-//     };
-// };
-
-
 const getCookieOptions = (extraOptions = {}) => {
     return {
         httpOnly: true,
@@ -43,17 +31,10 @@ authRouter.post('/signup', async (req, res) => {
     try {
         const { firstname, lastname, email, password } = req.body;
 
-        if (!firstname || firstname.length < 3) {
+        if (!firstname || !lastname) {
             return res.status(400).json({
                 success: false,
-                error: "First name is required and must be at least 2 characters long"
-            });
-        }
-
-        if (!lastname || lastname.length < 3) {
-            return res.status(400).json({
-                success: false,
-                error: "Last name is required and must be at least 2 characters long"
+                error: "First name and Last name are required"
             });
         }
 
@@ -587,7 +568,7 @@ authRouter.post('/forgot-password', async (req, res) => {
 
         try {
 
-            // await sendForgotPasswordOTP(user.email, otp);
+            await sendForgotPasswordOTP(user.email, otp);
 
         } catch (emailError) {
 
