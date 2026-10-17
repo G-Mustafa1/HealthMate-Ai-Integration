@@ -7,6 +7,7 @@ const validator = require('validator');
 
 const { User } = require('../models/user');
 const { Secession } = require('../models/Secession');
+const { Profile } = require('../models/Profile');
 
 const { generateOTP } = require('../utils/otp');
 
@@ -350,7 +351,7 @@ authRouter.post("/login", async (req, res) => {
                 userId: user._id,
                 refreshToken,
                 expiresAt: new Date(
-                    Date.now() + 24 * 60 * 60 * 1000
+                    Date.now() + 7 * 24 * 60 * 60 * 1000
                 ),
             },
             {
@@ -367,7 +368,7 @@ authRouter.post("/login", async (req, res) => {
 
         // Set refresh token cookie
         res.cookie("refreshToken", refreshToken, getCookieOptions({
-            maxAge: 24 * 60 * 60 * 1000,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         })
         );
 
@@ -375,6 +376,13 @@ authRouter.post("/login", async (req, res) => {
         sendLoginNotification(user.email).catch((error) => {
             console.error("❌ Login notification error:", error.message);
         });
+
+        // Include profile picture so navbar shows it right after login
+        const profile = await Profile.findOne({ user: user._id });
+
+        const profilePicture =
+            profile?.profilePicture?.url ||
+            (typeof profile?.profilePicture === 'string' ? profile.profilePicture : null);
 
         return res.status(200).json({
             success: true,
@@ -385,6 +393,7 @@ authRouter.post("/login", async (req, res) => {
                 lastname: user.lastname,
                 email: user.email,
                 isEmailVerified: user.isEmailVerified,
+                profilePicture,
             },
         });
 
@@ -494,7 +503,7 @@ authRouter.post('/refresh', async (req, res) => {
 
         session.refreshToken = newRefreshToken;
 
-        session.expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        session.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
         await session.save();
 
@@ -507,7 +516,7 @@ authRouter.post('/refresh', async (req, res) => {
         // SET NEW REFRESH TOKEN
 
         res.cookie("refreshToken", newRefreshToken, getCookieOptions({
-            maxAge: 24 * 60 * 60 * 1000
+            maxAge: 7 * 24 * 60 * 60 * 1000
         }));
 
         return res.status(200).json({
@@ -704,7 +713,7 @@ authRouter.post('/resend-reset-otp', async (req, res) => {
 
         try {
 
-            // await sendForgotPasswordOTP(user.email, otp);
+            await sendForgotPasswordOTP(user.email, otp);
 
         } catch (emailError) {
 

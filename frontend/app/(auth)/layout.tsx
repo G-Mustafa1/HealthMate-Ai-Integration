@@ -23,8 +23,14 @@ export default function AuthLayout({ children, }: Readonly<{ children: React.Rea
         );
     }
 
+    // Logged-in users are redirected to dashboard — show loader instead of a blank screen
     if (user) {
-        return null;
+        return (
+            <LoadingScreen
+                title="Taking you to your dashboard"
+                description="Login successful, setting things up..."
+            />
+        );
     }
 
     return (

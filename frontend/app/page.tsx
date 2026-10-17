@@ -5,21 +5,13 @@ import Hero from "@/components/Home/Hero";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import LoadingScreen from "@/components/LoadingScreen";
-import { useRouter } from "next/navigation";
 
 const Home = () => {
-  const { user, loading, authChecked } = useSelector(
+  const { loading, authChecked } = useSelector(
     (state: RootState) => state.auth
   );
 
-  // useEffect(() => {
-  //   if (authChecked && user) {
-  //     router.replace("/dashboard");
-  //   }
-  // }, [authChecked, user, router]);
-
-  // Redux abhi session check kar raha hai
-  if (!authChecked || (loading && !user)) {
+  if (!authChecked || loading) {
     return (
       <LoadingScreen
         title="Checking your account"
@@ -27,11 +19,6 @@ const Home = () => {
       />
     );
   }
-
-  // Logged-in user ko home page nahi dikhana
-  // if (user) {
-  //   return null;
-  // }
 
   return (
     <div className="min-h-screen bg-background text-foreground">

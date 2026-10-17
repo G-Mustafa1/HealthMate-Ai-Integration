@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { HeartPulse } from "lucide-react";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -18,7 +17,7 @@ export default function ProtectedLayout({
 }>) {
     const router = useRouter();
 
-    const { user, authChecked, loading, } = useSelector((state: RootState) => state.auth);
+    const { user, authChecked } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
         if (authChecked && !user) {
@@ -27,7 +26,7 @@ export default function ProtectedLayout({
     }, [authChecked, user, router]);
 
     // Account verification loading state
-    if (!authChecked || (loading && !user)) {
+    if (!authChecked) {
         return (
             <LoadingScreen
                 title="Checking your account"
@@ -36,8 +35,14 @@ export default function ProtectedLayout({
         );
     }
 
+    // Not logged in — redirect is in progress, show loader instead of a blank screen
     if (!user) {
-        return null;
+        return (
+            <LoadingScreen
+                title="Redirecting you to login"
+                description="Please wait a moment..."
+            />
+        );
     }
 
     return (
