@@ -3,7 +3,6 @@ const handlebars = require("handlebars");
 const fs = require("fs");
 const path = require("path");
 
-// ✅ Transporter ko top par rakhna best practice hai (Performance behtar hoti hai)
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -12,11 +11,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-/**
- * Load and compile Handlebars email template
- */
 const loadTemplate = (templateName, data = {}) => {
-    // ✅ CommonJS mein __dirname pehle se built-in hota hai
     const templatePath = path.join(__dirname, "../templates/emails", `${templateName}.hbs`);
 
     const templateSource = fs.readFileSync(templatePath, "utf-8");
@@ -29,9 +24,8 @@ const loadTemplate = (templateName, data = {}) => {
     });
 };
 
-/**
- * Send email
- */
+
+// Send email
 const sendEmail = async (to, subject, html) => {
     try {
         const mailOptions = {
@@ -49,9 +43,7 @@ const sendEmail = async (to, subject, html) => {
     }
 };
 
-/**
- * Signup email verification OTP
- */
+// Signup email verification OTP
 const sendSignupOTP = async (email, otp) => {
     const html = loadTemplate("signup-otp", {
         otp,
@@ -61,18 +53,15 @@ const sendSignupOTP = async (email, otp) => {
     return sendEmail(email, "Verify your HealthMate email", html);
 };
 
-/**
- * New login notification
- */
+
+// New login notification
 const sendLoginNotification = async (email) => {
     const html = loadTemplate("login-notification");
 
     return sendEmail(email, "New login to your HealthMate account", html);
 };
 
-/**
- * Forgot password OTP
- */
+// Forgot password OTP
 const sendForgotPasswordOTP = async (email, otp) => {
     const html = loadTemplate("forgot-password-otp", {
         otp,
@@ -82,16 +71,13 @@ const sendForgotPasswordOTP = async (email, otp) => {
     return sendEmail(email, "Reset your HealthMate password", html);
 };
 
-/**
- * Password changed notification
- */
+//Password changed notification
 const sendPasswordChangedEmail = async (email) => {
     const html = loadTemplate("password-changed");
 
     return sendEmail(email, "Your HealthMate password was changed", html);
 };
 
-// ✅ CommonJS Export Syntax
 module.exports = {
     sendSignupOTP,
     sendLoginNotification,

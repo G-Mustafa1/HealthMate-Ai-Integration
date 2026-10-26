@@ -374,12 +374,10 @@ authRouter.post("/login", async (req, res) => {
         })
         );
 
-        // Don't let email failure break login
         sendLoginNotification(user.email).catch((error) => {
             console.error("❌ Login notification error:", error.message);
         });
 
-        // Include profile picture so navbar shows it right after login
         const profile = await Profile.findOne({ user: user._id });
 
         const profilePicture =

@@ -1,79 +1,102 @@
-const jwt = require('jsonwebtoken');
-const { User } = require('../models/user');
-const { Secession } = require('../models/Secession');
-const { generateAccessToken, generateRefreshToken } = require('../utils/token');
+
+const jwt = require("jsonwebtoken");
+const { User } = require("../models/user");
+const { Secession } = require("../models/Secession");
+const {
+    generateAccessToken,
+    generateRefreshToken
+} = require("../utils/token");
 
 const isProduction = process.env.NODE_ENV === "production";
+const REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 
-const getCookieOptions = (extraOptions = {}) => ({
+const getCookieOptions = (maxAge) => ({
     httpOnly: true,
     secure: isProduction,
     sameSite: isProduction ? "none" : "lax",
     path: "/",
-    ...extraOptions
+    maxAge
 });
 
 const userAuth = async (req, res, next) => {
     try {
-        const token = req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
+        const token = req.cookies?.accessToken
+
         let user = null;
 
+        // Verify access token
         if (token) {
             try {
-                const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-                if (decoded?.id) {
-                    user = await User.findById(decoded.id).select("-password");
+                const { id } = jwt.verify(
+                    token,
+                    process.env.ACCESS_TOKEN_SECRET
+                );
+
+                if (id) {
+                    user = await User.findById(id).select("-password");
                 }
-            } catch (err) {
-                // Access token expired or invalid — fallback to refresh token below
+            } catch (error) {
+                if (error.name !== "TokenExpiredError" &&
+                    error.name !== "JsonWebTokenError" &&
+                    error.name !== "NotBeforeError") {
+                    throw error;
+                }
             }
         }
 
-        // 2. If access token was missing or expired, attempt seamless refresh with refreshToken
+        // Refresh access token if necessary
         if (!user) {
             const refreshToken = req.cookies?.refreshToken;
 
             if (refreshToken) {
                 try {
-                    const decodedRefresh = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+                    const decoded = jwt.verify(
+                        refreshToken,
+                        process.env.REFRESH_TOKEN_SECRET
+                    );
 
-                    if (decodedRefresh?.id && decodedRefresh.type === "refresh") {
-                        const session = await Secession.findOne({
-                            userId: decodedRefresh.id,
-                            refreshToken: refreshToken
-                        });
+                    if (decoded.type !== "refresh" || !decoded.id) {
+                        throw new Error("Invalid refresh token");
+                    }
 
-                        if (session && session.expiresAt > new Date()) {
-                            const dbUser = await User.findById(decodedRefresh.id).select("-password");
+                    const session = await Secession.findOne({
+                        userId: decoded.id,
+                        refreshToken,
+                        expiresAt: { $gt: new Date() }
+                    });
 
-                            if (dbUser) {
-                                // Generate new 15m access token & rotate 7d refresh token
-                                const newAccessToken = generateAccessToken(dbUser);
-                                const newRefreshToken = generateRefreshToken(dbUser);
+                    if (session) {
+                        user = await User.findById(decoded.id).select("-password");
 
-                                session.refreshToken = newRefreshToken;
-                                session.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-                                await session.save();
+                        if (user) {
+                            const newAccessToken = generateAccessToken(user);
+                            const newRefreshToken = generateRefreshToken(user);
 
-                                res.cookie("accessToken", newAccessToken, getCookieOptions({
-                                    maxAge: 15 * 60 * 1000, // 15 mins
-                                }));
+                            session.refreshToken = newRefreshToken;
+                            session.expiresAt = new Date(
+                                Date.now() + REFRESH_TOKEN_MAX_AGE
+                            );
 
-                                res.cookie("refreshToken", newRefreshToken, getCookieOptions({
-                                    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-                                }));
+                            await session.save();
 
-                                user = dbUser;
-                            }
+                            res.cookie("accessToken", newAccessToken, getCookieOptions(15 * 60 * 1000));
+
+                            res.cookie("refreshToken", newRefreshToken, getCookieOptions(REFRESH_TOKEN_MAX_AGE));
                         }
                     }
-                } catch (refreshErr) {
-                    // Refresh token is also expired or invalid
+                } catch (error) {
+                    if (
+                        error.name !== "TokenExpiredError" &&
+                        error.name !== "JsonWebTokenError" &&
+                        error.name !== "NotBeforeError" &&
+                        error.message !== "Invalid refresh token"
+                    ) {
+                        throw error;
+                    }
                 }
             }
         }
 
-        // 3. If neither token succeeded, user is unauthenticated
         if (!user) {
             return res.status(401).json({
                 success: false,
@@ -82,10 +105,10 @@ const userAuth = async (req, res, next) => {
         }
 
         req.user = user;
-        next();
-
+        return next();
     } catch (error) {
-        console.error("❌ Authentication error:", error);
+        console.error("Authentication error:", error);
+
         return res.status(500).json({
             success: false,
             error: "Authentication failed"
@@ -93,6 +116,4 @@ const userAuth = async (req, res, next) => {
     }
 };
 
-module.exports = {
-    userAuth
-};
+module.exports = { userAuth };
