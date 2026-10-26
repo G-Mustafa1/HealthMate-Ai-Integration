@@ -1,4 +1,5 @@
 import axiosInstance from "@/services/api";
+import { getApiErrorMessage } from "@/services/apiError";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export interface User {
@@ -58,13 +59,13 @@ export const loginUser = createAsyncThunk<User, LoginData, { rejectValue: string
     try {
       const response = await axiosInstance.post(
         "/auth/login",
-        data
+        data,
+        { timeout: 20000 } // hung request kabhi infinite pending na rahe
       );
 
       return response.data.user;
-    } catch (err: any) {
-      return rejectWithValue(
-        err.response?.data?.error || "Login failed");
+    } catch (err) {
+      return rejectWithValue(getApiErrorMessage(err, "Login failed"));
     }
   }
 );
@@ -80,9 +81,8 @@ export const signupUser = createAsyncThunk<User, SignupData, { rejectValue: stri
       );
 
       return response.data.user;
-    } catch (err: any) {
-      return rejectWithValue(
-        err.response?.data?.error || "Signup failed");
+    } catch (err) {
+      return rejectWithValue(getApiErrorMessage(err, "Signup failed"));
     }
   }
 );
@@ -94,9 +94,8 @@ export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
   async (_, { rejectWithValue }) => {
     try {
       await axiosInstance.post("/auth/logout");
-    } catch (err: any) {
-      return rejectWithValue(
-        err.response?.data?.error || "Logout failed");
+    } catch (err) {
+      return rejectWithValue(getApiErrorMessage(err, "Logout failed"));
     }
   }
 );
@@ -109,8 +108,8 @@ export const verifyEmailOTP = createAsyncThunk<User, VerifyEmailOTPData, { rejec
     try {
       const response = await axiosInstance.post("/auth/verify-email-otp", data);
       return response.data.user;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.error || "Failed to verify email");
+    } catch (err) {
+      return rejectWithValue(getApiErrorMessage(err, "Failed to verify email"));
     }
   }
 )
@@ -122,8 +121,8 @@ export const resendEmailOTP = createAsyncThunk<User, ResendEmailOTPData, { rejec
     try {
       const response = await axiosInstance.post("/auth/resend-email-otp", data);
       return response.data.user;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.error || "Failed to resend email");
+    } catch (err) {
+      return rejectWithValue(getApiErrorMessage(err, "Failed to resend email"));
     }
   }
 )
@@ -136,21 +135,21 @@ export const forgotPassword = createAsyncThunk<User, ForgotPasswordData, { rejec
     try {
       const response = await axiosInstance.post("/auth/forgot-password", data);
       return response.data.user;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.error || "Failed to forgot password");
+    } catch (err) {
+      return rejectWithValue(getApiErrorMessage(err, "Failed to forgot password"));
     }
   }
 )
 
 // reset password
 export const resetPassword = createAsyncThunk<User, ResetPasswordData, { rejectValue: string }>(
-  "auth/resetPassword", 
+  "auth/resetPassword",
   async (data, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post("/auth/reset-password", data);
       return response.data.user;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.error || "Failed to verify reset otp");
+    } catch (err) {
+      return rejectWithValue(getApiErrorMessage(err, "Password reset failed"));
     }
   }
 );
@@ -163,8 +162,8 @@ export const resendResetOTP = createAsyncThunk<User, ResendResetOTPData, { rejec
     try {
       const response = await axiosInstance.post("/auth/resend-reset-otp", data);
       return response.data.user;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.error || "Failed to resend reset otp");
+    } catch (err) {
+      return rejectWithValue(getApiErrorMessage(err, "Failed to resend reset otp"));
     }
   }
 );
@@ -175,25 +174,27 @@ export const verifyResetOTP = createAsyncThunk<User, VerifyResetOTPData, { rejec
   async (data, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post("/auth/verify-reset-otp", data);
-      console.log("hello mustafa ye response", response);
-      console.log("hy mustafa ye data user res ha", response.data.user);
       return response.data.user;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.error || "Failed to verify reset otp");
+    } catch (err) {
+      return rejectWithValue(getApiErrorMessage(err, "Failed to verify reset otp"));
     }
   }
 );
 
-// Get user profile
+// Get user (session check on app load)
 export const getUser = createAsyncThunk<User, void, { rejectValue: string }>(
   "auth/getUser",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/profile/getuser");
 
+      if (!response.data?.success || !response.data?.user) {
+        return rejectWithValue("Invalid user response");
+      }
+
       return response.data.user;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.error || "Failed to fetch user");
+    } catch (err: unknown) {
+      return rejectWithValue(getApiErrorMessage(err, "Failed to fetch user"));
     }
   }
 );

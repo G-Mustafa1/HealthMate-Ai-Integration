@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -25,7 +25,6 @@ export default function ProtectedLayout({
         }
     }, [authChecked, user, router]);
 
-    // Account verification loading state
     if (!authChecked) {
         return (
             <LoadingScreen
@@ -35,7 +34,6 @@ export default function ProtectedLayout({
         );
     }
 
-    // Not logged in — redirect is in progress, show loader instead of a blank screen
     if (!user) {
         return (
             <LoadingScreen

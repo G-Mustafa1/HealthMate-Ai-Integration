@@ -1,4 +1,5 @@
 import axiosInstance from "@/services/api";
+import { getApiErrorMessage } from "@/services/apiError";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 
@@ -29,19 +30,6 @@ interface GetProfileResponse {
     profile: Profile | null;
 }
 
-interface UpdateProfilePayload {
-    firstname: string;
-    lastname: string;
-    profilePicture?: string;
-    phone?: string;
-    gender?: string;
-    dateOfBirth?: string;
-    country?: string;
-    city?: string;
-    bloodGroup?: string;
-}
-
-// Normalize profilePicture (string | { url } | null) to a plain URL string
 export const getProfilePictureUrl = (
     picture?: Profile["profilePicture"]
 ): string | null => {
@@ -72,8 +60,8 @@ export const getProfile = createAsyncThunk<GetProfileResponse, void, { rejectVal
                 user: response.data.user,
                 profile: normalizeProfile(response.data.profile ?? null),
             };
-        } catch (err: any) {
-            return rejectWithValue(err.response?.data?.error || "Failed to fetch profile");
+        } catch (err) {
+            return rejectWithValue(getApiErrorMessage(err, "Failed to fetch profile"));
         }
     }
 );
@@ -88,8 +76,8 @@ export const updateProfile = createAsyncThunk<GetProfileResponse, FormData, { re
                 profile: normalizeProfile(response.data.profile ?? null)
             }
 
-        } catch (err: any) {
-            return rejectWithValue(err.response?.data?.message || "Failed to update profile");
+        } catch (err) {
+            return rejectWithValue(getApiErrorMessage(err, "Failed to update profile"));
         }
     }
 )

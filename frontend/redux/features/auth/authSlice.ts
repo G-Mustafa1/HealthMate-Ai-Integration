@@ -18,7 +18,7 @@ import { getProfilePictureUrl, updateProfile } from "../profile/profileThunks";
 interface AuthState {
   // Auth
   user: User | null;
-  loading: boolean;         // for login / signup / OTP actions
+  loading: boolean;
   authChecked: boolean;
   error: string | null;
 
@@ -256,7 +256,6 @@ const authSlice = createSlice({
       // GET USER (initial session check only)
       .addCase(getUser.pending, (state) => {
         state.loading = true;
-        state.authChecked = false;
         state.error = null;
       })
 

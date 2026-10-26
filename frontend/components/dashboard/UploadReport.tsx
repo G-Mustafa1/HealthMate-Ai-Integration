@@ -91,8 +91,6 @@ const UploadReport = () => {
             });
         } catch (err) {
             const message =
-                (typeof err === "string" && err) ||
-                (err instanceof Error && err.message) ||
                 "Only Medical reports are allowed.";
             Swal.fire({
                 icon: "error",

@@ -52,7 +52,7 @@ export default function Navbar() {
     const [open, setOpen] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
 
-    const { user, loading: authCheckLoading } = useSelector(
+    const { user, loading: authCheckLoading, authChecked } = useSelector(
         (state: RootState) => state.auth
     );
 
@@ -238,15 +238,22 @@ export default function Navbar() {
                 </Link>
 
                 {/* Desktop Navigation */}
-                {isAuthenticated && (
+                {!authChecked || authCheckLoading ? (
+                    <div className="hidden items-center gap-3 md:flex">
+                        <div className="h-4 w-20 animate-pulse rounded bg-muted/60" />
+                        <div className="h-4 w-16 animate-pulse rounded bg-muted/60" />
+                        <div className="h-4 w-20 animate-pulse rounded bg-muted/60" />
+                        <div className="h-4 w-16 animate-pulse rounded bg-muted/60" />
+                    </div>
+                ) : isAuthenticated ? (
                     <div className="hidden items-center gap-1 md:flex">
                         {renderNavLinks()}
                     </div>
-                )}
+                ) : null}
 
                 {/* Desktop Actions */}
                 <div className="hidden items-center gap-3 md:flex">
-                    {authCheckLoading ? (
+                    {!authChecked || authCheckLoading ? (
                         <div className="flex items-center gap-2">
                             <div className="h-9 w-9 animate-pulse rounded-full bg-muted" />
                             <div className="h-4 w-20 animate-pulse rounded bg-muted" />
@@ -373,7 +380,12 @@ export default function Navbar() {
                 `}
             >
                 <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
-                    {isAuthenticated ? (
+                    {!authChecked || authCheckLoading ? (
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="h-10 animate-pulse rounded-lg bg-muted/60" />
+                            <div className="h-10 animate-pulse rounded-lg bg-muted/60" />
+                        </div>
+                    ) : isAuthenticated ? (
                         <div className="space-y-4">
 
                             {/* Mobile Profile */}

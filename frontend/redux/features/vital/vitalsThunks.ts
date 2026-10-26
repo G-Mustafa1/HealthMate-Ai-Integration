@@ -1,4 +1,5 @@
 import axiosInstance from "@/services/api";
+import { getApiErrorMessage } from "@/services/apiError";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export interface Vital {
@@ -19,9 +20,7 @@ export interface AddVitalData {
   date?: string;
 }
 
-// =========================
 // ADD VITAL
-// =========================
 
 export const addVital = createAsyncThunk<
   Vital,
@@ -37,18 +36,15 @@ export const addVital = createAsyncThunk<
       );
 
       return response.data.vitals;
-    } catch (error: any) {
+    } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          "Failed to add vital"
+        getApiErrorMessage(error, "Failed to add vital")
       );
     }
   }
 );
 
-// =========================
 // GET MY VITALS
-// =========================
 
 export const getMyVitals = createAsyncThunk<
   Vital[],
@@ -63,18 +59,15 @@ export const getMyVitals = createAsyncThunk<
       );
 
       return response.data.vitals || [];
-    } catch (error: any) {
+    } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          "Failed to fetch vitals"
+        getApiErrorMessage(error, "Failed to fetch vitals")
       );
     }
   }
 );
 
-// =========================
 // DELETE VITAL
-// =========================
 
 export const deleteVital = createAsyncThunk<
   string,
@@ -89,10 +82,9 @@ export const deleteVital = createAsyncThunk<
       );
 
       return id;
-    } catch (error: any) {
+    } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          "Failed to delete vital"
+        getApiErrorMessage(error, "Failed to delete vital")
       );
     }
   }

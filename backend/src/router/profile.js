@@ -4,6 +4,7 @@ const { User } = require('../models/user');
 const { userAuth } = require('../middleware/authmiddle');
 const { Profile } = require('../models/Profile');
 const { uploadProfilePicture, cloudinary } = require('../cloudinary/cloudinary');
+const myCache = require('../config/cach');
 
 const USER_PUBLIC_FIELDS = '-password -emailOtp -emailOtpExpires -resetOtp -resetOtpExpires';
 
@@ -44,38 +45,64 @@ const uploadProfilePictureFile = (req, res, next) => {
 };
 
 
-profileRouter.get('/getuser', userAuth, async (req, res) => {
+
+profileRouter.get("/getuser", userAuth, async (req, res) => {
     try {
-        const user = await User.findById(req.user._id);
+        const user = req.user;
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(401).json({
+                success: false,
+                message: "User not authenticated",
+            });
         }
 
-        const profile = await Profile.findOne({ user: user._id });
+        const cacheKey = `user:${user._id}`;
+
+        // Cache hit: database query ki zaroorat nahi
+        const cachedUser = myCache.get(cacheKey);
+
+        if (cachedUser) {
+            return res.status(200).json({
+                success: true,
+                user: cachedUser,
+            });
+        }
+
+        const profile = await Profile.findOne({ user: user._id, }).select("profilePicture").lean();
 
         const profilePicture =
-            profile?.profilePicture?.url ||
-            (typeof profile?.profilePicture === 'string' ? profile.profilePicture : null);
+            profile?.profilePicture?.url ??
+            (typeof profile?.profilePicture === "string"
+                ? profile.profilePicture
+                : null);
 
-        // ✅ Match frontend expectation
-        res.status(200).json({
+        const userData = {
+            id: user._id,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            isEmailVerified: user.isEmailVerified,
+            profilePicture,
+        };
+
+        // Cache set; response is not dependent on background work
+        myCache.set(cacheKey, userData);
+
+        return res.status(200).json({
             success: true,
-            user: {
-                id: user._id,
-                firstname: user.firstname,
-                lastname: user.lastname,
-                email: user.email,
-                isEmailVerified: user.isEmailVerified,
-                profilePicture
-            }
+            user: userData,
         });
-
     } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(500).json({ success: false, message: 'Error fetching user', error: error.message });
+        console.error("Error fetching user:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Error fetching user",
+        });
     }
-})
+});
+
 
 profileRouter.get('/getallusers', userAuth, async (req, res) => {
     try {
@@ -275,6 +302,9 @@ profileRouter.put('/edituser', userAuth, uploadProfilePictureFile, async (req, r
                 console.warn('Cloudinary delete error:', err.message);
             });
         }
+
+        // Purana cached user ab stale hai (naam / profile picture badal gaya)
+        myCache.del(`user:${userId}`);
 
         return res.status(200).json({
             success: true,

@@ -42,9 +42,7 @@ const vitalsSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-      // =========================
       // ADD VITAL
-      // =========================
 
       .addCase(addVital.pending, (state) => {
         state.loading = true;
@@ -66,9 +64,7 @@ const vitalsSlice = createSlice({
           action.payload || "Failed to add vital";
       })
 
-      // =========================
       // GET MY VITALS
-      // =========================
 
       .addCase(getMyVitals.pending, (state) => {
         state.loading = true;
@@ -86,9 +82,7 @@ const vitalsSlice = createSlice({
           action.payload || "Failed to fetch vitals";
       })
 
-      // =========================
       // DELETE VITAL
-      // =========================
 
       .addCase(deleteVital.pending, (state) => {
         state.loading = true;

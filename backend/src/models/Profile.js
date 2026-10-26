@@ -8,7 +8,6 @@ const profileSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: "User",
             required: [true, "User is required"],
-            unique: true,
             index: true,
         },
 

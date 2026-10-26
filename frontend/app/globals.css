@@ -124,3 +124,26 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ---- Auth session-check progress bar ---- */
+.auth-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 9999;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--primary) / 0) 0%,
+    hsl(var(--primary)) 50%,
+    hsl(var(--primary) / 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: auth-bar-slide 1.2s ease-in-out infinite;
+}
+
+@keyframes auth-bar-slide {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

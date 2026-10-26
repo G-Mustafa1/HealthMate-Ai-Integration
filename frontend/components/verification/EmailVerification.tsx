@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { CheckCircle2, LockKeyhole, Mail, Loader2 } from "lucide-react";
+import { LockKeyhole, Mail, Loader2 } from "lucide-react";
 
 import {
     Card,
@@ -17,6 +17,7 @@ import { AppDispatch } from "@/redux/store";
 import { resendEmailOTP, verifyEmailOTP } from "@/redux/features/auth/authThunks";
 import toast from "react-hot-toast";
 import { clearError } from "@/redux/features/auth/authSlice";
+import { getThrownErrorMessage } from "@/services/apiError";
 
 const EmailVerification = () => {
     const router = useRouter();
@@ -147,8 +148,11 @@ const EmailVerification = () => {
                     return prev - 1;
                 });
             }, 1000);
-        } catch (error: any) {
-            const message = error?.message || "Failed to resend verification code. Please try again.";
+        } catch (error) {
+            const message = getThrownErrorMessage(
+                error,
+                "Failed to resend verification code. Please try again."
+            );
             setError(message);
             toast.error(message);
         }
@@ -266,7 +270,7 @@ const EmailVerification = () => {
                         {/* Resend */}
                         <div className="mt-6 text-center">
                             <p className="text-xs text-muted-foreground">
-                                Didn't receive the code?
+                                Didn&apos;t receive the code?
                             </p>
 
                             <button

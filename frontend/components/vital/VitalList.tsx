@@ -6,14 +6,13 @@ import Swal from 'sweetalert2'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/redux/store'
 import { deleteVital } from '@/redux/features/vital/vitalsThunks'
+import { getThrownErrorMessage } from '@/services/apiError'
 
 const VitalList = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { vitals } = useSelector((state: RootState) => state.vitals);
     const [deletingId, setDeletingId] = useState<string | null>(null);
-    // ==========================================
     // DELETE VITAL
-    // ==========================================
     const handleDelete = async (id: string) => {
         const result = await Swal.fire({
             title: "Delete this vital?",
@@ -41,13 +40,10 @@ const VitalList = () => {
                 timer: 1500,
                 showConfirmButton: false,
             });
-        } catch (err: any) {
+        } catch (err) {
             Swal.fire({
                 title: "Delete Failed",
-                text:
-                    typeof err === "string"
-                        ? err
-                        : err?.message || "Unable to delete vital.",
+                text: getThrownErrorMessage(err, "Unable to delete vital."),
                 icon: "error",
                 confirmButtonColor: "#2563eb",
             });
@@ -56,9 +52,7 @@ const VitalList = () => {
         }
     };
 
-    // ==========================================
     // FORMAT DATE
-    // ==========================================
     const formatDate = (date: string) => {
         const parsedDate = new Date(date);
 

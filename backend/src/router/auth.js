@@ -15,11 +15,13 @@ const { sendSignupOTP, sendLoginNotification, sendForgotPasswordOTP, sendPasswor
 
 const { generateAccessToken, generateRefreshToken } = require('../utils/token');
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const getCookieOptions = (extraOptions = {}) => {
     return {
         httpOnly: true,
-        secure: true, // Set to true in production
-        sameSite: "none", // Set to "none" in production
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
         path: "/",
         ...extraOptions
     };
@@ -362,7 +364,7 @@ authRouter.post("/login", async (req, res) => {
 
         // Set access token cookie
         res.cookie("accessToken", accessToken, getCookieOptions({
-            maxAge: 15 * 60 * 1000,
+            maxAge: 15 * 60 * 1000, // 15 mins
         })
         );
 
@@ -510,7 +512,7 @@ authRouter.post('/refresh', async (req, res) => {
         // SET NEW ACCESS TOKEN
 
         res.cookie("accessToken", newAccessToken, getCookieOptions({
-            maxAge: 15 * 60 * 1000
+            maxAge: 15 * 60 * 1000 // 15 mins
         }));
 
         // SET NEW REFRESH TOKEN

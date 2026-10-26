@@ -1,4 +1,5 @@
 import axiosInstance from "@/services/api";
+import { getApiErrorMessage } from "@/services/apiError";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export interface Report {
@@ -37,10 +38,9 @@ export const getMyReports = createAsyncThunk<
       );
 
       return response.data.reports || [];
-    } catch (error: any) {
+    } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error ||
-        "Failed to fetch reports"
+        getApiErrorMessage(error, "Failed to fetch reports")
       );
     }
   }
@@ -60,10 +60,9 @@ export const getSingleReport = createAsyncThunk<
       );
 
       return response.data.report;
-    } catch (error: any) {
+    } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error ||
-        "Failed to fetch report"
+        getApiErrorMessage(error, "Failed to fetch report")
       );
     }
   }
@@ -83,10 +82,9 @@ export const getInsights = createAsyncThunk<
       );
 
       return response.data.insights || [];
-    } catch (error: any) {
+    } catch (error) {
       return rejectWithValue(
-        error.response?.data?.error ||
-        "Failed to fetch insights"
+        getApiErrorMessage(error, "Failed to fetch insights")
       );
     }
   }
@@ -105,13 +103,9 @@ export const uploadReport = createAsyncThunk<Report, File, { rejectValue: string
 
       return response.data.report;
 
-    } catch (error: any) {
-      
-    return rejectWithValue(
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        error.message ||
-        "Failed to upload report"
+    } catch (error) {
+      return rejectWithValue(
+        getApiErrorMessage(error, "Failed to upload report")
       );
     }
   }
@@ -130,11 +124,9 @@ export const deleteReport = createAsyncThunk<
       await axiosInstance.delete(`/report/${id}`);
 
       return id;
-    } catch (error: any) {
+    } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        "Failed to delete report"
+        getApiErrorMessage(error, "Failed to delete report")
       );
     }
   }

@@ -1,5 +1,6 @@
 const express = require('express');
 require('dotenv').config();
+const morgan = require('morgan');
 
 const cors = require('cors')
 const cookieParser = require('cookie-parser');
@@ -9,6 +10,7 @@ const { profileRouter } = require('./router/profile');
 const { authRouter } = require('./router/auth');
 const { reportRouter } = require('./router/report');
 const { vitalsRouter } = require('./router/vitial');
+
 
 const app = express();
 
@@ -24,7 +26,7 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());
-
+app.use(morgan("dev"));
 
 app.use('/auth', authRouter);
 app.use('/profile', profileRouter);

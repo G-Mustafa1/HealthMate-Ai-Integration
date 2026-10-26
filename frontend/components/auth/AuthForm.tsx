@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -26,6 +26,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
 import { AppDispatch, RootState } from "@/redux/store";
+import { getThrownErrorMessage } from "@/services/apiError";
 import { allowEmailVerification, clearError } from "@/redux/features/auth/authSlice";
 import {
     loginUser,
@@ -47,7 +48,7 @@ export default function AuthForm({
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
 
-    const { loading, error, user } = useSelector(
+    const { loading, error } = useSelector(
         (state: RootState) => state.auth
     );
 
@@ -141,9 +142,10 @@ export default function AuthForm({
             });
 
             setShowPassword(false);
-        } catch (err: any) {
-            const errorMessage = err;
-            toast.error(errorMessage || "An error occurred. Please try again.");
+        } catch (err) {
+            toast.error(
+                getThrownErrorMessage(err, "An error occurred. Please try again.")
+            );
         }
     };
 

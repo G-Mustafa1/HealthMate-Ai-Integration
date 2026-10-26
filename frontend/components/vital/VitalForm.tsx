@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/redux/store'
 import Swal from 'sweetalert2'
 import { addVital } from '@/redux/features/vital/vitalsThunks'
+import { getThrownErrorMessage } from '@/services/apiError'
 
 interface FormData {
     bp: string;
@@ -123,13 +124,10 @@ const VitalForm = () => {
                 timer: 1600,
                 showConfirmButton: false,
             });
-        } catch (err: any) {
+        } catch (err) {
             Swal.fire({
                 title: "Unable to Add Vital",
-                text:
-                    typeof err === "string"
-                        ? err
-                        : err?.message || "Something went wrong.",
+                text: getThrownErrorMessage(err, "Something went wrong."),
                 icon: "error",
                 confirmButtonColor: "#2563eb",
             });

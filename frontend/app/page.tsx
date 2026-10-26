@@ -7,15 +7,13 @@ import { RootState } from "@/redux/store";
 import LoadingScreen from "@/components/LoadingScreen";
 
 const Home = () => {
-  const { loading, authChecked } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const { user, loading, authChecked } = useSelector((state: RootState) => state.auth);
 
-  if (!authChecked || loading) {
+  if (!authChecked && (loading && !user)) {
     return (
       <LoadingScreen
-        title="Checking your account"
-        description="Getting everything ready for you..."
+        title="Welcome to HealthMate"
+        description="Loading your profile..."
       />
     );
   }

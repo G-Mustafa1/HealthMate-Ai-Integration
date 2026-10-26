@@ -47,9 +47,7 @@ const reportSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-      // =========================
       // GET MY REPORTS
-      // =========================
 
       .addCase(getMyReports.pending, (state) => {
         state.loading = true;
@@ -67,9 +65,7 @@ const reportSlice = createSlice({
           action.payload || "Failed to fetch reports";
       })
 
-      // =========================
       // GET SINGLE REPORT
-      // =========================
 
       .addCase(getSingleReport.pending, (state) => {
         state.loading = true;
@@ -87,9 +83,7 @@ const reportSlice = createSlice({
           action.payload || "Failed to fetch report";
       })
 
-      // =========================
       // GET INSIGHTS
-      // =========================
 
       .addCase(getInsights.pending, (state) => {
         state.loading = true;
@@ -107,9 +101,7 @@ const reportSlice = createSlice({
           action.payload || "Failed to fetch insights";
       })
 
-      // =========================
       // UPLOAD REPORT
-      // =========================
 
       .addCase(uploadReport.pending, (state) => {
         state.uploadLoading = true;
@@ -131,9 +123,7 @@ const reportSlice = createSlice({
           action.payload || "Failed to upload report";
       })
 
-      // =========================
       // DELETE REPORT
-      // =========================
 
       .addCase(deleteReport.pending, (state) => {
         state.deleteLoading = true;

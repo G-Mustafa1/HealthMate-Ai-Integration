@@ -5,20 +5,19 @@ import { useEffect } from "react";
 
 import { AppDispatch, store } from "./store";
 import { getUser } from "./features/auth/authThunks";
-interface ReduxProviderProps {
-    children: React.ReactNode;
-}
 
-function AuthInitializer({
-    children,
-}: ReduxProviderProps) {
+function AuthInitializer() {
     const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
         dispatch(getUser());
     }, [dispatch]);
 
-    return <>{children}</>;
+    return null;
+}
+
+interface ReduxProviderProps {
+    children: React.ReactNode;
 }
 
 export default function ReduxProvider({
@@ -26,9 +25,8 @@ export default function ReduxProvider({
 }: ReduxProviderProps) {
     return (
         <Provider store={store}>
-            <AuthInitializer>
-                {children}
-            </AuthInitializer>
+            <AuthInitializer />
+            {children}
         </Provider>
     );
 }
