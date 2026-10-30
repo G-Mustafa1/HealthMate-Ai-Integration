@@ -65,7 +65,7 @@ export default function Insights() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
+    <main className="min-h-screen bg-linear-to-b from-background via-background to-muted/20">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
 
         {/* Page Header */}
@@ -148,7 +148,7 @@ export default function Insights() {
                 className="group overflow-hidden border-border/60 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
               >
                 {/* Top Accent */}
-                <div className="h-1 w-full bg-gradient-to-r from-primary via-primary/70 to-accent" />
+                <div className="h-1 w-full bg-linear-to-r from-primary via-primary/70 to-accent" />
 
                 <CardHeader className="pb-4">
                   <div className="flex items-start gap-3">
