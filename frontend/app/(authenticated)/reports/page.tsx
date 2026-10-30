@@ -230,7 +230,7 @@ const Reports = () => {
                                 className="group overflow-hidden border-border/60 bg-card/80 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl"
                             >
                                 {/* Top Accent */}
-                                <div className="h-1 w-full bg-gradient-to-r from-primary via-primary/70 to-accent" />
+                                <div className="h-1 w-full bg-linear-to-r from-primary via-primary/70 to-accent" />
 
                                 <CardHeader className="pb-4">
                                     <div className="flex items-start justify-between gap-4">
