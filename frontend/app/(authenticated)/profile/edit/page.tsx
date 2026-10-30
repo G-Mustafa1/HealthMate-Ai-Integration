@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 const Edit = () => {
   return (
-    <main className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-background via-background to-muted/30">
+    <main className="min-h-[calc(100vh-4rem)] bg-linear-to-b from-background via-background to-muted/30">
       <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
 
         {/* BACK */}
