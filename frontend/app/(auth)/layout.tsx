@@ -34,7 +34,7 @@ export default function AuthLayout({ children, }: Readonly<{ children: React.Rea
     }
 
     return (
-        <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-background via-secondary/40 to-background">
+        <main className="relative min-h-screen overflow-hidden bg-linear-to-br from-background via-secondary/40 to-background">
 
             <div className="pointer-events-none absolute inset-0">
                 <div
